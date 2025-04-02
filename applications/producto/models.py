@@ -1,0 +1,85 @@
+from model_utils.models import TimeStampedModel
+
+from django.db import models
+from django.utils.text import slugify
+
+from .managers import ProductManager
+
+# Create your models here.
+class Marca(TimeStampedModel):
+    name=models.CharField('Nombre', max_length=30)
+
+    class Meta:
+        verbose_name='Marca'
+        verbose_name_plural='Marcas'
+
+    def __str__(self):
+        return self.name
+    
+class Provider(TimeStampedModel):
+    name=models.CharField('Razon Social', max_length=100)
+    email=models.EmailField(blank=True, null=True)
+    phone=models.CharField('telefono', max_length=40, blank=True)
+    web=models.URLField('sitio web', blank=True)
+
+    class Meta:
+        verbose_name='Proveedor'
+        verbose_name_plural='Proveedores'
+
+    def __str__(self):
+        return self.name
+    
+class Category(TimeStampedModel):
+    name=models.CharField('Categoría', max_length=50)
+
+    class Meta:
+        verbose_name='Categoría'
+        verbose_name_plural='Categorias'
+
+    def __str__(self):
+        return self.name
+
+class Product(TimeStampedModel):
+
+    UNIT_CHOICES = (
+        ('0', 'Kilogramos'),
+        ('1', 'Litros'),
+        ('2', 'Unidades'),
+    )
+
+    category=models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
+    barcode=models.CharField(max_length=13, unique=True)
+    name=models.CharField('Nombre', max_length=40)
+    slug=models.SlugField(max_length=50, unique=True, blank=True)
+    provider=models.ForeignKey(Provider, on_delete=models.CASCADE)
+    marca=models.ForeignKey(Marca, on_delete=models.CASCADE)
+    due_date=models.DateField('fecha de vencimiento', blank=True, null=True)
+    description=models.TextField('Descripcion del Producto', blank=True)
+    unit=models.CharField('unidad de medida', max_length=1, choices=UNIT_CHOICES)
+    count=models.PositiveIntegerField('Cantidad en Almacén', default=0)
+    purchase_price=models.DecimalField('Precio de Compra', max_digits=7, decimal_places=2)
+    sale_price=models.DecimalField('Precio de Venta', max_digits=7, decimal_places=2)
+    num_sale=models.PositiveIntegerField('Numero de Ventas', default=0)
+    anulate=models.BooleanField('Eliminado', default=False)
+
+    objects=ProductManager()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            #Genera un slug base a partir del nombre
+            base_slug=slugify(self.name)
+            slug=base_slug
+            counter=1
+            #Verifica si el slug ya existe y de ser asi lo mofica agregando un sufijo numerico
+            while Product.objects.filter(slug=slug).exists():
+                slug=f'{base_slug}-{counter}'
+                counter+=1
+            self.slug=slug
+        super(Product, self).save(*args, **kwargs)
+    
+    class Meta:
+        verbose_name='Producto'
+        verbose_name_plural='Productos'
+
+    def __str__(self):
+        return str(self.id)+'-'+self.name
