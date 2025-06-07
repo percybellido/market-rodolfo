@@ -5,7 +5,7 @@
 {% load static %}
 
 {% block content %}
-    <div class="container px-4 px-lg-5 bg-primary">
+    <div class="container-fluid px-4 px-lg-5 lista-productos">
         <div class="bg-info mt-3 mb-3 px-4 row">
 
             <form class="col-10 mt-3 mb-3" method="GET" >
@@ -25,23 +25,7 @@
             </div>
         </div>
     
-            <div class="row mt-4">
-                <div class="col">
-                  <a href="?order=name">
-                    <span class="btn btn-primary mb-3">Por Nombre</span>
-                  </a>
-                </div>
-                <div class="col">
-                  <a href="?order=date">
-                    <span class="btn btn-primary mb-3">Por Fecha</span>
-                  </a>
-                </div>
-                <div class="col">
-                  <a href="?order=stock">
-                    <span class="btn btn-primary mb-3">Por Stock</span>
-                  </a>
-                </div>
-              </div>
+            
         
         
         <h2 class="mb-4 text-center mt-4">Lista de Productos</h2>
@@ -51,18 +35,27 @@
                 <th scope="col">Código</th>
                 <th scope="col">Nombre</th>
                 <th scope="col">Proveedor</th>
-                <th scope="col">P.C</th>
+                <th scope="col">P.V</th>
+                <th scope="col">Stock</th>
                 <th scope="col">Descripción</th>
                 <th scope="col">F.V</th>
+                <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for product in productos %}
-                    <tr>
+                    <tr class="{% if product.count <= 6 %}table-danger{% endif %}">
                         <th scope="row">{{product.barcode}}</th>
                         <td>{{product.name}}</td>
                         <td>{{product.provider}}</td>
-                        <td>{{product.purchase_price}}</td>
+                        <td>{{product.sale_price}}</td>
+                        <td>{{product.count}}
+                            {% if product.count <= 6 %}
+                              <span class="text-danger ms-2">
+                                  <i class="bi bi-exclamation-triangle-fill"></i> ¡Se agotan!
+                              </span>
+                            {% endif %}
+                        </td>
                         <td>{{product.description}}</td>
                         <td>{{product.due_date}}</td>
                         <td>

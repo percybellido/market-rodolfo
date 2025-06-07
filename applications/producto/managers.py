@@ -50,3 +50,11 @@ class ProductManager(models.Manager):
             return consulta.order_by('-num_sale')
         else:
             return consulta.order_by('-created')
+        
+    def productos_en_cero(self):
+            #
+            consulta = self.filter(
+            count__lt=6
+            )
+            #
+            return consulta

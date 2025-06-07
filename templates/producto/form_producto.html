@@ -21,10 +21,13 @@
             </div>
 
             <div class="row mb-2">
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
-                {{ form.barcode }}
+              <div class="col-12">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+                  {{ form.barcode }}
+                </div>
               </div>
+              
             </div>
             
             
@@ -69,12 +72,17 @@
           {{ form.unit }}
         </div>
       </div>
+      
       <div class="col-md-6">
       <label>Fecha de Vencimiento:</label>
+
       <div class="input-group">
-        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-        {{ form.due_date }}
+        <div class="col-12">
+          <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+          {{ form.due_date }}
+        </div>
       </div>
+
     </div>
   
     </div>  

@@ -24,50 +24,51 @@ class ProductForm(forms.ModelForm):
             'barcode': forms.TextInput(
                 attrs = {
                     'placeholder': 'Codigo de barras',
-                    'class': 'input-group',
+                    'class': 'form-control',
+                    'autofocus': 'autofocus',
                 }
             ),
             'name': forms.TextInput(
                 attrs = {
                     'placeholder': 'Nombre...',
-                    'class': 'input-group',
+                    'class': 'form-control',
                 }
             ),
             'due_date': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs = {
                     'type': 'date',
-                    'class': 'input-group',
+                    'class': 'form-control',
                 }
             ),
             'description': forms.Textarea(
                 attrs = {
                     'placeholder': 'Descripcion del producto',
                     'rows': '3',
-                    'class': 'input-group',
+                    'class': 'form-control',
                 }
             ),
             'unit': forms.Select(
                 attrs = {
-                    'class': 'input-group',
+                    'class': 'form-control',
                 }
             ),
             'count': forms.NumberInput(
                 attrs = {
                     'placeholder': 'Codigo de barras',
-                    'class': 'input-group',
+                    'class': 'form-control',
                 }
             ),
             'purchase_price': forms.NumberInput(
                 attrs = {
                     'placeholder': '1',
-                    'class': 'input-group',
+                    'class': 'form-control',
                 }
             ),
             'sale_price': forms.NumberInput(
                 attrs = {
                     'placeholder': '1',
-                    'class': 'input-group',
+                    'class': 'form-control',
                 }
             ),
         }
