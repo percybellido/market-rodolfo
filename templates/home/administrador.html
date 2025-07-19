@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  <!-- Tarjetas de resumen -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="bg-success text-white text-center p-3 rounded">
+        <h5>Total Ventas del Dia</h5>
+        <h3>S/ {{ total_ventas }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="bg-primary text-white text-center p-3 rounded">
+        <h5>Total Anulaciones</h5>
+        <h3>S/ {{ total_anulaciones }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="bg-danger text-white text-center p-3 rounded">
+        <h5>Productos Cerca de 0</h5>
+        <h3>{{ stock_cero }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de informe semanal -->
+  <div class="mb-4">
+    <h4>Informe de Ultimos 7 Dias de Ventas:</h4>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha</th>
+            <th>Número Ventas</th>
+            <th>Total Vendido</th>
+            <th>Total Ganancias</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for venta in resumen_semana %}
+          <tr>
+            <td>{{ venta.sale__date_sale__date }}</td>
+            <td>{{ venta.num_ventas }}</td>
+            <td>{{ venta.total_vendido }}</td>
+            <td>{{ venta.total_ganancias }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}

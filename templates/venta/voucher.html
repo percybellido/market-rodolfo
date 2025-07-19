@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>MiniMarket Rodolfo</h3>
+    <p>Fecha:{{venta.date_sale}}</p>
+        
+    <p>Cantidad de Productos:{{venta.count}}</p>
+           
+        
+    <p>Tipo de Pago:{{venta.get_type_invoce_display}}</p>
+        
+    <div>
+        <h4>Lista de Productos:</h4>
+    <ul>
+        {% for producto in detalle_productos %}
+          <li>{{ producto.product.name }} -- {{ producto.count }} -- {{ producto.price_sale}}</li>
+        {% endfor %}
+
+    </ul>
+    <p class="px-7">Monto Pagado:{{venta.amount}}</p>
+
+    </div>
+    
+
+</body>
+</html>

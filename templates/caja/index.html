@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="row text-center mb-4">
+    <div class="col-md-4">
+      <div class="alert alert-success">
+        <h5>Total Ventas Hoy</h5>
+        <h3>S/ {{ total_vendido }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="alert alert-primary">
+        <h5>Total Anulaciones</h5>
+        <h3>S/ {{ total_anulado }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="alert alert-danger">
+        <h5>Total Ventas</h5>
+        <h3>{{ num_ventas_hoy }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <h4>Detalle de las ventas del Día:</h4>
+    {% for venta in ventas_dia %}
+      <table class="table table-bordered">
+        <thead class="table-success">
+          <tr>
+            <th>N° {{ venta.id }}</th>
+            <th>PAGO: {{ venta.get_type_payment_display }}</th>
+            <th>FACTURA: {{ venta.get_type_invoce_display }}</th>
+            <th>CANTIDAD: {{ venta.count }}</th>
+            <th>TOTAL: S/ {{ venta.amount }}</th>
+          </tr>
+        </thead>
+      </table>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio Venta</th>
+            <th>Cantidad</th>
+            <th>Sub Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detalle in venta.detail_sale.all %}
+            <tr>
+              <td>{{ detalle.product.name }}</td>
+              <td>S/. {{ detalle.price_sale }}</td>
+              <td>{{ detalle.count }}</td>
+              <td>S/ {{ detalle.subtotal }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </div>
+
+  <div class="text-center">
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#cerrarCajaModal">
+      Cerrar Caja
+    </button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="cerrarCajaModal" tabindex="-1" aria-labelledby="cerrarCajaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-center w-100" id="cerrarCajaModalLabel">¿Seguro que desea cerrar caja?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <h3 class="text-success">Monto Total: S/ {{ total_vendido }}</h3>
+      </div>
+      <div class="modal-footer">
+        <form action="{% url 'caja_app:caja-cerrar' %}" method="post" class="w-100 text-center">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success">Confirmar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

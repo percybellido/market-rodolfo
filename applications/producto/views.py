@@ -44,15 +44,7 @@ class ProductDetailView(DetailView):
     template_name = "producto/detail.html"
     model = Product
 
-    #def get_context_data(self, **kwargs):
-        #context = super().get_context_data(**kwargs)
-        #
-        #context["ventas_mes"] = SaleDetail.objects.ventas_mes_producto(
-          #  self.kwargs['pk']
-        #)
-        #return context
-
-
+    
 class FiltrosProductListView(ListView):
     template_name="producto/filtros.html"
     context_object_name='productos'

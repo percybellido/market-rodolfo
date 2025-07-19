@@ -5,8 +5,8 @@
 {% load static %}
 
 {% block content %}
-    <div class="container-fluid px-4 px-lg-5 lista-productos">
-        <div class="bg-info mt-3 mb-3 px-4 row">
+    <div class="container-fluid  px-lg-3 lista-productos">
+        <div class="fondo-producto mt-3 mb-3 px-4 row">
 
             <form class="col-10 mt-3 mb-3" method="GET" >
               
@@ -50,9 +50,11 @@
                         <td>{{product.provider}}</td>
                         <td>{{product.sale_price}}</td>
                         <td>{{product.count}}
-                            {% if product.count <= 6 %}
-                              <span class="text-danger ms-2">
-                                  <i class="bi bi-exclamation-triangle-fill"></i> ¡Se agotan!
+                            {% if product.count == 0 %}
+                              <span class="stock1 ms-3">¡¡Agotado!!</span>
+                            {% elif product.count <= 6 %}
+                              <span class="stock2 ms-3">
+                                ¡Se agotan!
                               </span>
                             {% endif %}
                         </td>
@@ -60,7 +62,7 @@
                         <td>{{product.due_date}}</td>
                         <td>
                           {% if product.id %}
-                            <a href="{% url 'producto_app:producto-update' product.id %}" class="bt btn-success"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'producto_app:producto-update' product.id %}" class="btn btn-success"><i class="bi bi-pencil"></i></a>
                           {% else %}
                           <a href="{% url 'producto_app:producto-add' %}" class="btn btn-success mb-3">Registrar Nuevo</a>
                           {% endif %}

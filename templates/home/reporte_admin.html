@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  {% include "includes/reporte-options.html" %}
+
+  <div class="row mt-4">
+    <div class="col">
+      <h4>
+        Tus Ventas hasta hoy:
+        <strong class="fs-4">S/. {{ total_ventas }}</strong>
+      </h4>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Mes</th>
+              <th>Número de Ventas</th>
+              <th>Venta Total</th>
+              <th>Ganancia Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for venta in resumen_ventas_mes %}
+            <tr>
+              <td>{{ venta.sale__date_sale__date__month }} / {{ venta.sale__date_sale__date__year }}</td>
+              <td>{{ venta.cantidad_ventas }}</td>
+              <td>S/. <strong>{{ venta.total_ventas }}</strong></td>
+              <td>S/. <strong class="text-primary">{{ venta.ganancia_total }}</strong></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if is_paginated %}
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item ">
+                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+                </li>
+              {% endif %}
+              {% for i in paginator.page_range %}
+                <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+              {% endfor %}
+
+              {% if page_obj.has_next %}
+                <li class="page-item ">
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+    </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

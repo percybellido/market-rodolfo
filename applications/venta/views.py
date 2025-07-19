@@ -40,6 +40,18 @@ class AddCarView(VentasPermisoMixin, FormView):
     def form_valid(self, form):
         barcode = form.cleaned_data['barcode']
         count = form.cleaned_data['count']
+
+        # Intentamos cargar el producto, si no existe avisamos y volvemos
+        try:
+            producto = Product.objects.get(barcode=barcode)
+        except Product.DoesNotExist:
+            messages.error(
+                self.request,
+                f"❌ El código de barras '{barcode}' no corresponde a ningún producto.",
+                extra_tags='danger'
+            )
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+        
         obj, created = CarShop.objects.get_or_create(
             barcode=barcode,
             defaults={
@@ -101,53 +113,77 @@ class CarShopDeleteAll(VentasPermisoMixin, View):
 
 
 class ProcesoVentaSimpleView(VentasPermisoMixin, View):
-    """ Procesa una venta simple """
-
     def post(self, request, *args, **kwargs):
-        #
-        procesar_venta(
+        # 1. Recojo el carrito
+        productos_en_car = CarShop.objects.select_related('product').all()
+
+        # 2. Busco todos los problemas de stock
+        faltantes = []
+        for item in productos_en_car:
+            disponible = item.product.count
+            solicitado = item.count
+            if solicitado > disponible:
+                faltantes.append(
+                    (item.product.name, disponible, solicitado)
+                )
+
+        # 3. Si hay faltantes, aviso y vuelvo sin procesar
+        if faltantes:
+            for nombre, disp, sol in faltantes:
+                messages.error(
+                    request,
+                    f"❌ Stock insuficiente para '{nombre}': disponible {disp}, solicitado {sol}.",
+                    extra_tags='danger'
+                )
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+
+        # 4. Si todo OK, proceso la venta
+        venta = procesar_venta(
             self=self,
             type_invoce=Sale.SIN_COMPROBANTE,
             type_payment=Sale.CASH,
             user=self.request.user,
         )
-        #
-        return HttpResponseRedirect(
-            reverse(
-                'venta_app:venta-index'
-            )
-        )
-
+        messages.success(request, "✔️ Venta procesada correctamente.", extra_tags='success')
+        return HttpResponseRedirect(reverse('venta_app:venta-index'))
 
 class ProcesoVentaVoucherView(VentasPermisoMixin, FormView):
-    form_class = VentaVoucherForm
+    form_class  = VentaVoucherForm
     success_url = '.'
-    
+
     def form_valid(self, form):
+        # 1. Pre-check de stock
+        productos_en_car = CarShop.objects.select_related('product').all()
+        faltantes = []
+        for item in productos_en_car:
+            if item.count > item.product.count:
+                faltantes.append((item.product.name, item.product.count, item.count))
+
+        if faltantes:
+            for nombre, disp, sol in faltantes:
+                messages.error(
+                    self.request,
+                    f"❌ Stock insuficiente para '{nombre}': disponible {disp}, solicitado {sol}.",
+                    extra_tags='danger'
+                )
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+
+        # 2. Si pasa, llamo a procesar_venta
         type_payment = form.cleaned_data['type_payment']
-        type_invoce = form.cleaned_data['type_invoce']
-        #
+        type_invoce  = form.cleaned_data['type_invoce']
         venta = procesar_venta(
             self=self,
             type_invoce=type_invoce,
             type_payment=type_payment,
             user=self.request.user,
         )
-        #
-        if venta: 
+
+        if venta:
             return HttpResponseRedirect(
-                reverse(
-                    'venta_app:venta-voucher_pdf',
-                    kwargs={'pk': venta.pk },
-                )
+                reverse('venta_app:venta-voucher_pdf', kwargs={'pk': venta.pk})
             )
-        else:
-            return HttpResponseRedirect(
-                reverse(
-                    'venta_app:venta-index'
-                )
-            )
-                
+        messages.error(self.request, "No se pudo procesar la venta.", extra_tags='danger')
+        return HttpResponseRedirect(reverse('venta_app:venta-index'))
 
 
 class VentaVoucherPdf(VentasPermisoMixin, View):

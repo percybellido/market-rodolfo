@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container fondo mt-4">
+  
+  {% if messages %}
+  <div class="container mt-3">
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  <div class="row mb-3 mt-3">
+    <form class="col-md-8 d-flex align-items-center" method="POST">{% csrf_token %}
+      <label class="input-group-text">COD/CAN:</label>
+      {{ form.barcode }}
+      {{ form.count }}
+      <button type="submit" class="btn btn-secondary ms-2">Agregar</button>
+    </form>
+
+    
+
+    <div class="col-md-4">
+      <a class="btn btn-outline-secondary w-100" href="{% url 'venta_app:venta-list' %}">
+        <i class="bi bi-trash"></i>
+        <span>Ultimas Ventas</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <h5>Productos en Venta</h5>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">COD</th>
+            <th scope="col">Nombres</th>
+            <th scope="col">Precio (S/)</th>
+            <th scope="col">Cantidad</th>
+            <th colspan="2" class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for producto in productos %}
+            <tr>
+              <td>{{ producto.barcode }}</td>
+              <td>{{ producto.product.name }}</td>
+              <td>{{ producto.product.sale_price }}</td>
+              <td>{{ producto.count }}</td>
+              <td>
+                <form action="{% url 'venta_app:carshop-add' producto.id %}" method="POST">{% csrf_token %}
+                  <button type="submit" class="btn btn-info"><i class="bi bi-plus"></i></button>
+                </form>
+              </td>
+              <td>
+                <form action="{% url 'venta_app:carshop-update' producto.id %}" method="POST">{% csrf_token %}
+                  <button type="submit" class="btn btn-primary"><i class="bi bi-dash"></i></button>
+                </form>
+              </td>
+              <td>
+                <form action="{% url 'venta_app:carshop-delete' producto.id %}" method="POST">{% csrf_token %}
+                  <button type="submit" class="btn btn-danger"><i class="bi bi-x"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <div class="alert alert-success text-center">
+        <h5>Total a Cobrar:</h5>
+        <h2>S/ {{ total_cobrar }}</h2>
+      </div>
+
+      <form action="{% url 'venta_app:venta-simple' %}" method="POST">{% csrf_token %}
+        <button type="submit" class="btn btn-primary w-100 mb-2">
+          <i class="bi bi-credit-card"></i> Pagar Todo
+        </button>
+      </form>
+
+      <button data-bs-toggle="modal" data-bs-target="#exampleModal1" class="btn btn-success w-100 mb-2">
+        <i class="bi bi-printer"></i> Cobrar e Imprimir
+      </button>
+
+      <form action="{% url 'venta_app:carshop-delete_all' %}" method="POST">{% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger w-100">
+          <i class="bi bi-trash"></i> Limpiar Todo
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Detalle del comprobante de pago</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{% url 'venta_app:venta-voucher' %}" method="POST">{% csrf_token %}
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Tipo de Pago:</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                {{ form_voucher.type_payment }}
+              </div>
+              {% for error in form.type_payment.errors %}
+                <div class="text-danger">{{ error|escape }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Tipo de Comprobante:</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-archive"></i></span>
+                {{ form_voucher.type_invoce }}
+              </div>
+              {% for error in form.type_invoce.errors %}
+                <div class="text-danger">{{ error|escape }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Pagar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block panel-content %}
+<div class="container my-4">
+  {% include "includes/reporte-options.html" %}
+
+  <form class="row g-3" method="GET">
+    <div class="col-md-3">
+      <label for="id_provider" class="form-label">Proveedor:</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fi-book"></i></span>
+        {{ form.provider }}
+      </div>
+    </div>
+    <div class="col-md-3">
+      <label for="id_date_start" class="form-label">Fecha Inicio:</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fi-calendar"></i></span>
+        {{ form.date_start }}
+      </div>
+    </div>
+    <div class="col-md-3">
+      <label for="id_date_end" class="form-label">Fecha Fin:</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fi-calendar"></i></span>
+        {{ form.date_end }}
+      </div>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </div>
+  </form>
+
+  <div class="row mt-4">
+    <div class="col">
+      <h4>Total a Pagar: <strong class="fs-4">S/. {{ total_ventas }}</strong></h4>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Fecha</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio Compra</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for venta in ventas_liquidacion %}
+            <tr>
+              <td>{{ venta.sale.date_sale }}</td>
+              <td>{{ venta.product.name }}</td>
+              <td>{{ venta.count }}</td>
+              <td>{{ venta.price_purchase }}</td>
+              <td>{{ venta.sub_total }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

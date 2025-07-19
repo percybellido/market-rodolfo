@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  
+  {% include "includes/reporte-options.html" %}
+
+  <form class="row mb-4" method="GET">
+    <div class="col-md-4">
+      <label class="form-label">Fecha Inicio:</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        {{ form.date_start }}
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Fecha Fin:</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        {{ form.date_end }}
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Buscar</label><br>
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+  </form>
+
+  <div class="mb-4">
+    <h4>Ventas en Rango de Fechas:</h4>
+    {% for venta in resumen_ventas %}
+      <table class="table table-bordered">
+        <thead class="table-success">
+          <tr>
+            <th>N° {{ venta.id }}</th>
+            <th>Fecha: {{ venta.date_sale|date:'m/d/Y P' }}</th>
+            <th>PAGO: {{ venta.get_type_payment_display }}</th>
+            <th>FACTURA: {{ venta.get_type_invoce_display }}</th>
+            <th>CANTIDAD: {{ venta.count }}</th>
+            <th>TOTAL: S/ {{ venta.amount }}</th>
+          </tr>
+        </thead>
+      </table>
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio Venta</th>
+            <th>Cantidad</th>
+            <th>Sub Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detalle in venta.detail_sale.all %}
+            <tr>
+              <td>{{ detalle.product.name }}</td>
+              <td>S/. {{ detalle.price_sale }}</td>
+              <td>{{ detalle.count }}</td>
+              <td>S/ {{ detalle.subtotal }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

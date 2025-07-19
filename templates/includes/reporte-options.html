@@ -1,0 +1,22 @@
+<div class="row mb-4 d-flex justify-content-between">
+    <div class="col-md-4">
+      <div class="bg-success text-white text-center p-3 rounded">
+        <a class="{% if request.resolver_match.url_name == 'admin-reporte' %}fw-bold text-decoration-underline{% endif %}" 
+           href="{% url 'inicio_app:admin-reporte' %}" 
+           style="font-size: 16px; color: white;">
+          Informe de Ingresos
+        </a>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="bg-success text-white text-center p-3 rounded">
+        <a class="{% if request.resolver_match.url_name == 'admin-resumen_ventas' %}fw-bold text-decoration-underline{% endif %}" 
+           href="{% url 'inicio_app:admin-resumen_ventas' %}" 
+           style="font-size: 16px; color: white;">
+          Resumen Ventas
+        </a>
+      </div>
+    </div>
+</div>
+  
