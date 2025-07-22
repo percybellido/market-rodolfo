@@ -83,12 +83,12 @@
 
       <form action="{% url 'venta_app:venta-simple' %}" method="POST">{% csrf_token %}
         <button type="submit" class="btn btn-primary w-100 mb-2">
-          <i class="bi bi-credit-card"></i> Pagar Todo
+          <i class="bi bi-credit-card"></i> Pagar Sin Comprobante
         </button>
       </form>
 
       <button data-bs-toggle="modal" data-bs-target="#exampleModal1" class="btn btn-success w-100 mb-2">
-        <i class="bi bi-printer"></i> Cobrar e Imprimir
+        <i class="bi bi-printer"></i> Pagar e Imprimir
       </button>
 
       <form action="{% url 'venta_app:carshop-delete_all' %}" method="POST">{% csrf_token %}
