@@ -30,18 +30,28 @@ class SaleManager(models.Manager):
             return consulta['total']
         else:
             return 0
-    
+        
     def total_ventas_anuladas_dia(self):
+        hoy = timezone.now().date()
         consulta = self.filter(
-            close=False,
-            anulate=True
+            anulate=True,
+            date_created__date=hoy
         ).aggregate(
             total=Sum('amount')
         )
-        if consulta['total']:
-            return consulta['total']
-        else:
-            return 0
+        return consulta['total'] or 0
+
+    #def total_ventas_anuladas_dia(self):
+      #  consulta = self.filter(
+           # close=False,
+           # anulate=True
+        #).aggregate(
+        #    total=Sum('amount')
+        #)
+        #if consulta['total']:
+            #return consulta['total']
+        #else:
+           # return 0#
     
     def cerrar_ventas(self):
         consulta = self.filter(
@@ -131,38 +141,7 @@ class SaleDetailManager(models.Manager):
             )
         ).order_by('-sale__date_sale__date__month')
     
-    def resumen_ventas_proveedor(self, **filters):
-        # recibe 3 parametros en un diccionario
-        # devuelve lista de ventas en rango de fechas de un proveedor
-        # y, devuelve el total de ventas en rango de fechas y de proveedor
-
-        if filters['date_start'] and filters['date_end'] and filters['provider']:
-            consulta = self.filter(
-                anulate=False,
-                sale__date_sale__range = (
-                    filters['date_start'],
-                    filters['date_end'],
-                ),
-                product__provider__pk=filters['provider'],
-            )
-            
-            lista_ventas = consulta.annotate(
-                sub_total=ExpressionWrapper(
-                    F('price_purchase')*F('count'),
-                    output_field=FloatField()
-                )
-            ).order_by('sale__date_sale')
-
-            total_ventas = consulta.aggregate(
-                total_venta=Sum(
-                    F('price_purchase')*F('count'),
-                    output_field=FloatField()
-                )
-            )['total_venta']
-
-            return lista_ventas, total_ventas
-        else:
-            return [], 0
+    
 
 
 

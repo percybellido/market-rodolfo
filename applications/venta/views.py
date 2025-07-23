@@ -185,18 +185,23 @@ class ProcesoVentaVoucherView(VentasPermisoMixin, FormView):
         messages.error(self.request, "No se pudo procesar la venta.", extra_tags='danger')
         return HttpResponseRedirect(reverse('venta_app:venta-index'))
 
-
 class VentaVoucherPdf(VentasPermisoMixin, View):
     
     def get(self, request, *args, **kwargs):
         venta = Sale.objects.get(id=self.kwargs['pk'])
+        detalles = SaleDetail.objects.filter(sale__id=self.kwargs['pk'])
+
+        # Agregar subtotal a cada item
+        for detalle in detalles:
+            detalle.subtotal = detalle.count * detalle.price_sale
+
         data = {
             'venta': venta,
-            'detalle_productos': SaleDetail.objects.filter(sale__id=self.kwargs['pk'])
+            'detalle_productos': detalles,
         }
         pdf = render_to_pdf('venta/voucher.html', data)
         return HttpResponse(pdf, content_type='application/pdf')
-
+    
 
 class SaleListView(VentasPermisoMixin, ListView):
     template_name = 'venta/ventas.html'

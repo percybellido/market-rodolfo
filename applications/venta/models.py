@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
+from django.utils import timezone
 #
 from model_utils.models import TimeStampedModel
 
@@ -41,6 +42,9 @@ class Sale(TimeStampedModel):
     date_sale = models.DateTimeField(
         'Fecha de Venta',
     )
+
+    date_created = models.DateTimeField(auto_now_add=True)
+
     count = models.PositiveIntegerField('Cantidad de Productos')
     amount = models.DecimalField(
         'Monto', 

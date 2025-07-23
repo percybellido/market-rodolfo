@@ -1,31 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <style>
+        body {
+            font-family: monospace;
+            font-size: 11px;
+            width: 240px; /* 58 mm */
+            margin: 0 auto;
+        }
+        .centrado {
+            text-align: center;
+        }
+        .derecha {
+            text-align: right;
+        }
+        .linea {
+            border-top: 1px dashed #000;
+            margin: 4px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 2px 0;
+            vertical-align: top;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
-    <h3>MiniMarket Rodolfo</h3>
-    <p>Fecha:{{venta.date_sale}}</p>
-        
-    <p>Cantidad de Productos:{{venta.count}}</p>
-           
-        
-    <p>Tipo de Pago:{{venta.get_type_invoce_display}}</p>
-        
-    <div>
-        <h4>Lista de Productos:</h4>
-    <ul>
-        {% for producto in detalle_productos %}
-          <li>{{ producto.product.name }} -- {{ producto.count }} -- {{ producto.price_sale}}</li>
-        {% endfor %}
 
-    </ul>
-    <p class="px-7">Monto Pagado:{{venta.amount}}</p>
-
+    <div class="centrado">
+        <strong>MiniMarket Rodolfo</strong><br>
+        Fecha: {{ venta.date_sale|date:"d/m/Y H:i" }}<br>
+        <div class="linea"></div>
     </div>
-    
 
+    <p>Cantidad de productos: {{ venta.count }}</p>
+    <p>Tipo de Pago: {{ venta.get_type_invoce_display }}</p>
+
+    <div class="linea"></div>
+    <strong>Productos:</strong>
+
+    <table>
+        {% for producto in detalle_productos %}
+        <tr>
+            <td>
+                {{ producto.product.name|truncatechars:20 }}<br>
+                {{ producto.count }} x {{ producto.price_sale|floatformat:2 }}
+            </td>
+            <td class="derecha">
+                S/. {{ producto.subtotal|floatformat:2 }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="linea"></div>
+    <table>
+        <tr>
+            <td class="derecha total">TOTAL:</td>
+            <td class="derecha total">S/. {{ venta.amount|floatformat:2 }}</td>
+        </tr>
+    </table>
+
+    <div class="linea"></div>
+    <p class="centrado">¡Gracias por su compra!</p>
 </body>
 </html>

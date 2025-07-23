@@ -23,7 +23,9 @@
       </div>
     </div>
   </div>
-
+  
+  
+  {% if ventas_dia %}
   <div class="mb-4">
     <h4>Detalle de las ventas del Día:</h4>
     {% for venta in ventas_dia %}
@@ -59,14 +61,20 @@
         </tbody>
       </table>
     {% endfor %}
+  {% else %}
+  <div class="mb-4 text-center">
+    <h5 class="text-muted">No hay ventas pendientes para cerrar.</h5>
   </div>
-
+{% endif %}
+  </div>
+{% if ventas_dia %}
   <div class="text-center">
     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#cerrarCajaModal">
       Cerrar Caja
     </button>
   </div>
 </div>
+{% endif %}
 
 <!-- Modal -->
 <div class="modal fade" id="cerrarCajaModal" tabindex="-1" aria-labelledby="cerrarCajaModalLabel" aria-hidden="true">

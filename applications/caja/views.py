@@ -21,7 +21,7 @@ class ReporteCierreCajaView(VentasPermisoMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ventas_dia"] = detalle_ventas_no_cerradas
+        context["ventas_dia"] = detalle_ventas_no_cerradas()
         context["total_vendido"] = Sale.objects.total_ventas_dia()
         context["total_anulado"] = Sale.objects.total_ventas_anuladas_dia()
         context["num_ventas_hoy"] = Sale.objects.ventas_no_cerradas().count()
