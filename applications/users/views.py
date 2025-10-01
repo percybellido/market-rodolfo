@@ -68,7 +68,7 @@ class LogoutView(View):
         logout(request)
         return HttpResponseRedirect(
             reverse(
-                'users_app:user-login'
+                'inicio_app:inicio'
             )
         )
 

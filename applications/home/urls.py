@@ -25,5 +25,16 @@ urlpatterns = [
         views.ReporteResumenVentas.as_view(),
         name='admin-resumen_ventas',
     ),
+    path(
+        'acerca-de/',
+        views.about,
+        name='acerca-de'
+    ),
+
+    path(
+        'contacto/',
+        views.contact,
+        name='contact'
+    ),
     
 ]

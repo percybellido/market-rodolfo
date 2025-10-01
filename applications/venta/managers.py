@@ -113,20 +113,26 @@ class SaleDetailManager(models.Manager):
         return True
     
     def resumen_ventas(self):
-        return self.filter(
-            sale__anulate=False,
-            sale__close=True,
-        ).values('sale__date_sale__date').annotate(
-            total_vendido=Sum(
-                F('price_sale')*F('count'),
-                output_field=FloatField()
-            ),
-            total_ganancias=Sum(
-                F('price_sale')*F('count') - F('price_purchase')*F('count'),
-                output_field=FloatField()
-            ),
-            num_ventas=Sum('count'),
+        return (
+            self.filter(
+                sale__anulate=False,
+                sale__close=True,
+            )
+            .values('sale__date_sale__date')
+            .annotate(
+                total_vendido=Sum(
+                    F('price_sale') * F('count'),
+                    output_field=FloatField()
+                ),
+                total_ganancias=Sum(
+                    F('price_sale') * F('count') - F('price_purchase') * F('count'),
+                    output_field=FloatField()
+                ),
+                num_ventas=Sum('count'),
+            )
+            .order_by('-sale__date_sale__date')[:10]  # 👈 aquí fuerzas el orden por fecha ascendente
         )
+
     
     def resumen_ventas_mes(self):
         #

@@ -12,6 +12,7 @@ from django.views.generic import (
 
 from .forms import ProductForm
 
+
 class ProductListView(ListView):
     template_name="producto/lista.html"
     context_object_name='productos'
@@ -61,18 +62,28 @@ class FiltrosProductListView(ListView):
         )
         return queryset()
     
+from django.shortcuts import get_object_or_404
+from django.views.generic import ListView
+from .models import Product, Category
+
 class CategoryProductListView(ListView):
-    model=Product
-    template_name="producto/category_list.html"
-    context_object_name="productos"
+    model = Product
+    template_name = "producto/category_list.html"
+    context_object_name = "products"  # más consistente con los templates
 
     def get_queryset(self):
-        category_slug=self.kwargs.get('slug')
-        category=get_object_or_404(Category, slug=category_slug)
-        return Product.objects.filter(category=category)
-    
+        category_slug = self.kwargs.get('slug')
+        if category_slug:
+            category = get_object_or_404(Category, slug=category_slug)
+            return Product.objects.filter(category=category)
+        return Product.objects.all()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Agregar todas las categorías para el menú
         context['categories'] = Category.objects.all()
+        context['current_slug'] = self.kwargs.get('slug', '')
         return context
+
+def productos_por_vencer_view(request):
+    productos = Product.objects.productos_por_vencer()  # usando tu ProductManager
+    return render(request, "producto/por_vencer.html", {"productos": productos})

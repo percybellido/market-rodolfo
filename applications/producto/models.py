@@ -29,16 +29,20 @@ class Provider(TimeStampedModel):
     def __str__(self):
         return self.name
     
-class Category(TimeStampedModel):
-    name=models.CharField('Categoría', max_length=50)
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        verbose_name='Categoría'
-        verbose_name_plural='Categorias'
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
-
+    
 class Product(TimeStampedModel):
 
     UNIT_CHOICES = (
@@ -48,7 +52,7 @@ class Product(TimeStampedModel):
     )
 
     category=models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
-    barcode=models.CharField(max_length=13, unique=True)
+    barcode=models.CharField(max_length=13, unique=True, blank=True, null=True, verbose_name="Código de barras")
     name=models.CharField('Nombre', max_length=40)
     slug=models.SlugField(max_length=50, unique=True, blank=True)
     provider=models.ForeignKey(Provider, on_delete=models.CASCADE)
@@ -61,6 +65,9 @@ class Product(TimeStampedModel):
     sale_price=models.DecimalField('Precio de Venta', max_digits=7, decimal_places=2)
     num_sale=models.PositiveIntegerField('Numero de Ventas', default=0)
     anulate=models.BooleanField('Eliminado', default=False)
+    image=models.ImageField(upload_to='uploads/product/', null=True, blank=True)
+    # Add Sale Stuff
+    is_sale=models.BooleanField(default=False)
 
     objects=ProductManager()
 

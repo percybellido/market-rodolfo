@@ -1,15 +1,4 @@
 @charset "UTF-8";
-/*!
-* Start Bootstrap - Shop Item v5.0.6 (https://startbootstrap.com/template/shop-item)
-* Copyright 2013-2023 Start Bootstrap
-* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-shop-item/blob/master/LICENSE)
-*/
-/*!
- * Bootstrap  v5.2.3 (https://getbootstrap.com/)
- * Copyright 2011-2022 The Bootstrap Authors
- * Copyright 2011-2022 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- */
 
 body {
   margin: 0;
@@ -70,8 +59,27 @@ h3, .h3 {
     color: #ff7f07 !important;  /* amarillo Bootstrap */
 }
 
+.nav-link{
+  font-size:0.8rem;
+  color: #6b431e;
+}
+
+.nav-link:hover{
+  color: #ff7f07;
+  text-transform: uppercase;
+  font-size:0.85rem;
+}
+
+.nav-link.active {
+  color: #d35400;        /* distinto del hover */
+  font-size: 1.3rem;     /* 0.5rem más grande que el base (0.8 + 0.5) */
+  text-transform: uppercase;
+  font-weight: bold;
+  background-color: transparent !important; /* opcional: quitar el fondo azul de Bootstrap */
+}
+
 .text-portada{
-  color:rgb(173, 29, 29);
+  color:#6b431e
 }
   
 .portada {
@@ -104,4 +112,230 @@ h3, .h3 {
 }
 .stock2{
   color: rgb(180, 56, 56);
+}
+
+.product-img {
+    height: 400px;         /* altura uniforme */
+    object-fit: cover;     /* recorta sin deformar */
+    object-position: center; /* centra la imagen */
+}
+
+.card {
+    min-height: 100%;         /* que todas tengan el mismo alto */
+}
+
+.masthead {
+    min-height: 60vh; /* 70% de la altura de la pantalla */
+    background-size: cover;
+    background-position: center;
+}
+.text-faded {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.site-heading {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+  text-transform: uppercase;
+  line-height: 1;
+  font-family: 'Raleway';
+}
+
+.site-heading .site-heading-upper {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.site-heading .site-heading-lower {
+  font-size: 5rem;
+  font-weight: 100;
+  line-height: 4rem;
+}
+
+.page-section {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+}
+
+.section-heading {
+  text-transform: uppercase;
+  color:#6b431e
+}
+
+.section-heading .section-heading-upper {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  padding-bottom:.5rem;
+
+}
+
+.section-heading .section-heading-lower {
+  display: block;
+  font-size: 3rem;
+  font-weight: 100;
+}
+
+
+.section-heading .section-heading-under {
+  display: block;
+  font-size: 1rem;
+  text-transform: none;
+  font-weight: 300;
+  margin-top:.5rem;
+}
+
+.bg-card {
+  background-color: #e6a756;
+}
+.bg-faded {
+  background-color: rgba(233, 195, 73, 0.85);
+}
+
+#mainNav {
+  background-color: rgba(47, 23, 15, 0.9);
+  font-family: 'Raleway';
+}
+
+#mainNav .navbar-brand {
+  color: #e6a756;
+}
+
+#mainNav .navbar-nav .nav-item .nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 800;
+}
+
+#mainNav .navbar-nav .nav-item.active .nav-link {
+  color: #e6a756;
+}
+
+@media (min-width: 992px) {
+  #mainNav .navbar-nav .nav-item .nav-link {
+    font-size: 0.9rem;
+  }
+  #mainNav .navbar-nav .nav-item .nav-link:hover {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  #mainNav .navbar-nav .nav-item.active .nav-link:hover {
+    color: #e6a756;
+  }
+}
+
+.btn-xl {
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.intro {
+  position: relative;
+  
+}
+
+@media (min-width: 992px) {
+  .intro .intro-img {
+    width: 75%;
+    float: right;
+  }
+  .intro .intro-text {
+    left: 0;
+    width: 60%;
+    margin-top: 12rem;
+    position: absolute;
+  }
+  .intro .intro-text .intro-button {
+    width: 100%;
+    left: 0;
+    position: absolute;
+    bottom: -2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .intro .intro-text {
+    width: 45%;
+  }
+}
+
+.cta {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background-color: rgba(230, 167, 86, 0.9);
+}
+
+.cta .cta-inner {
+  position: relative;
+  padding: 3rem;
+  margin: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.cta .cta-inner:before {
+  border-radius: 0.5rem;
+  content: '';
+  position: absolute;
+  top: -0.5rem;
+  bottom: -0.5rem;
+  left: -0.5rem;
+  right: -0.5rem;
+  border: 0.25rem solid rgba(255, 255, 255, 0.85);
+}
+
+.cta .cta-innerv {
+  position: relative;
+  padding: 3rem;
+  margin: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+@media (min-width: 992px) {
+  .about-heading .about-heading-img {
+    position: relative;
+    z-index: 0;
+  }
+  .about-heading .about-heading-content {
+    margin-top: -5rem;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.navbar-nav .nav-link {
+      font-size: 0.9rem;  /* más pequeño que el default (~1rem) */
+      white-space: nowrap; /* evita que el texto se divida en dos líneas */
+  }
+
+.boton1 {
+  background: #6b431e;
+  color: white;
+}
+
+@media (max-width: 576px) { /* aplica en móviles */
+  .contacto {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+}
+
+@media (max-width: 576px) { /* aplica en móviles */
+  .section-heading .section-heading-lower {
+    font-size: 2rem;
+  }
+}
+
+.producto {
+  color:#6b431e;
+  font-size: 3rem;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.blog {
+  font-size: 3rem;
+  color:#6b431e;
 }

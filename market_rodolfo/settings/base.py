@@ -20,10 +20,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
+    'ckeditor',
     
     #Local Apps
     'applications.users',
     'applications.home',
+    'applications.blog',
     'applications.producto',
     'applications.venta',
     'applications.caja'
@@ -53,6 +55,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'market_rodolfo.context_processors.menu_categories',
             ],
         },
     },
@@ -91,4 +94,17 @@ USE_I18N = True
 
 
 USE_TZ = True  
+
+#Media files
+MEDIA_URL='/media/'
+MEDIA_ROOT = BASE_DIR / "media"
+
+#Ckeditor
+CKEDITOR_CONFIGS={
+    'default':{
+        'toolbar':None,
+    }
+}
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -71,5 +71,13 @@
 
     <div class="linea"></div>
     <p class="centrado">¡Gracias por su compra!</p>
+
+    <script>
+        window.print();
+        window.onafterprint = function() {
+            // Aquí pones la URL de tu pantalla de vender
+            window.location.href = "{% url 'venta_app:venta-index' %}";
+        };
+    </script>
 </body>
 </html>

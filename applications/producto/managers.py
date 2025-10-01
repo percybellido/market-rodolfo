@@ -58,3 +58,13 @@ class ProductManager(models.Manager):
             )
             #
             return consulta
+    
+    def productos_por_vencer(self, dias=200):
+        """
+        Retorna productos cuya fecha de vencimiento está dentro de los próximos `dias` días.
+        Por defecto, 10 días.
+        """
+        hoy = timezone.now().date()
+        limite = hoy + timedelta(days=dias)
+        por_vencer= self.filter(due_date__range=(hoy, limite)).order_by('due_date')
+        return por_vencer

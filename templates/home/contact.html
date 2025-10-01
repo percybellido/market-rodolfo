@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Contacto{% endblock %}
+
+{% block hero %}
+<header class="masthead"
+        style="background-image: url('{% static "img/contacto_r.jpg" %}');
+               background-size: cover;
+               background-position: center;
+               min-height: 70vh;">
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4 contacto">
+    <div class="col-lg-8 col-md-10 mx-auto text-portada">
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+            Saepe nostrum ullam eveniet pariatur voluptates odit, fuga atque ea nobis sit soluta odio, 
+            adipisci quas excepturi maxime quae totam ducimus consectetur?
+        </p>
+        <br>
+        <p><b>Teléfono:</b> 51 935905532</p>
+        <p><b>Horario de atencion:</b>Lunes-Domingo 7:30 am - 2pm</p>
+
+        <h3 class="mt-5 text-center">Envíame un mensaje</h3>
+        <form method="post" action="">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" name="email" id="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="mensaje" class="form-label">Mensaje</label>
+                <textarea name="mensaje" id="mensaje" rows="5" class="form-control" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-4">Enviar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

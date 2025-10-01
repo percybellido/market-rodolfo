@@ -8,7 +8,6 @@
         <meta name="author" content="" />
         <title>{% block title %}{% endblock %}</title>
 
-        
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Bootstrap icons-->
@@ -35,66 +34,78 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-4">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="#!">Market Rodolfo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <a class="navbar-brand" href="{% url 'inicio_app:inicio' %}">Market Rodolfo</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
 
+                        <!-- Opciones accesibles para TODOS -->
                         <li class="nav-item px-lg-4">
                             <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'inicio' %}active{% endif %}" href="{% url 'inicio_app:inicio' %}">Inicio</a>
                         </li>
-
                         <li class="nav-item px-lg-4">
-                            <a class="nav-link text-uppercase {% if request.resolver_match.namespace == 'producto_app' %}active{% endif %}" href="{% url 'producto_app:producto-lista' %}">Productos</a>
+                            <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'acerca-de' %}active{% endif %}" href="{% url 'inicio_app:acerca-de' %}">Acerca de</a>
                         </li>
-
-                        <li class="nav-item dropdown px-lg-4">
-                            <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'venta-index' or request.resolver_match.url_name == 'caja-index' %}active{% endif %} dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Ventas</a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li>
-                                    <a class="dropdown-item text-uppercase {% if request.resolver_match.url_name == 'venta-index' %}active{% endif %}" href="{% url 'venta_app:venta-index' %}">Vender</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-uppercase {% if request.resolver_match.url_name == 'caja-index' %}active{% endif %}" href="{% url 'caja_app:caja-index' %}">Cerrar Caja</a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li class="nav-item dropdown px-lg-4">
-                            <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'index-admin' or  request.resolver_match.url_name == 'user-lista' or  request.resolver_match.url_name == 'admin-reporte' %}active{% endif %} dropdown-toggle " id="navbarDropdown2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administrar</a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                                <li>
-                                    <a class="dropdown-item text-uppercase {% if request.resolver_match.url_name == 'index-admin' %}active{% endif %}" href="{% url 'inicio_app:index-admin' %}">Administracion</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-uppercase {% if request.resolver_match.url_name == 'user-lista' %}active{% endif %}" href="{% url 'users_app:user-lista' %}">Usuarios</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-uppercase{% if request.resolver_match.url_name == 'admin-reporte' %}active{% endif %}" href="{% url 'inicio_app:admin-reporte' %}">Reportes</a>
-                                </li>
-                            </ul>
-                        </li>
-
                         <li class="nav-item px-lg-4">
-                            <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'admin:index' %}active{% endif %}" href="{% url 'admin:index' %}">Admin</a>
+                            <a class="nav-link text-uppercase {% if request.resolver_match.namespace == 'producto_app' %}active{% endif %}" href="{% url 'producto_app:product-list' %}">Productos</a>
                         </li>
-
                         <li class="nav-item px-lg-4">
-                            <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'user-logout' %}active{% endif %}" href="{% url 'users_app:user-logout' %}">Salir</a>
+                            <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'blog' %}active{% endif %}" href="{% url 'blog_app:blog' %}">Blog</a>
+                        </li>
+                        <li class="nav-item px-lg-4">
+                            <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'inicio_app:contact' %}">Contacto</a>
                         </li>
 
+                        {% if user.is_authenticated %}
+                            <!-- Opciones SOLO para usuarios logueados -->
+                            <li class="nav-item dropdown px-lg-4">
+                                <a class="nav-link dropdown-toggle text-uppercase {% if request.resolver_match.url_name in 'venta-index caja-index' %}active{% endif %}" href="#" id="ventasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Ventas
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="ventasDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'producto_app:producto-lista' %}">Productos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'venta_app:venta-index' %}">Vender</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'caja_app:caja-index' %}">Cerrar Caja</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown px-lg-4">
+                                <a class="nav-link dropdown-toggle text-uppercase {% if request.resolver_match.url_name in 'index-admin user-lista admin-reporte' %}active{% endif %}" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Administrar
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'inicio_app:index-admin' %}">Administración</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'users_app:user-lista' %}">Usuarios</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'inicio_app:admin-reporte' %}">Reportes</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item px-lg-4">
+                                <a class="nav-link text-uppercase" href="{% url 'users_app:user-logout' %}">Salir</a>
+                            </li>
+                        {% else %}
+                            <!-- Opciones SOLO para usuarios no logueados -->
+                            <li class="nav-item px-lg-4">
+                                <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'user-login' %}active{% endif %}" href="{% url 'users_app:user-login' %}">Ingresar</a>
+                            </li>
+                            
+                        {% endif %}
                     </ul>
                 </div>
             </div>
         </nav>
+        
+        <!-- Bloque opcional para encabezados de página -->
+        {% block hero %}{% endblock %}
 
         <main class="flex-grow-1">
             {% block content %}
             {% endblock %}
         </main>
-         
         
-       
         <!-- Footer-->
         <footer class="py-5 bg-dark text-light">
             <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Market Rodolfo 2025</p></div>

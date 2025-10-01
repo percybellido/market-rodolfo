@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import (
     TemplateView,
     ListView
@@ -10,6 +10,13 @@ from applications.users.mixins import AdminPermisoMixin
 from .forms import LiquidacionProviderForm, ResumenVentasForm
 #
 from .functions import detalle_resumen_ventas
+
+from django.conf import settings
+
+from django.urls import reverse
+from .forms import ContactForm
+from django.core.mail import send_mail
+
 
 
 class HomeView(TemplateView):
@@ -23,7 +30,7 @@ class PanelAdminView(AdminPermisoMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["total_ventas"] = Sale.objects.total_ventas_dia()
         context["total_anulaciones"] = Sale.objects.total_ventas_anuladas_dia()
-        context["stock_cero"] = Product.objects.productos_en_cero().count()
+        context["por_vencer"] = Product.objects.productos_por_vencer().count()
         context["resumen_semana"] = SaleDetail.objects.resumen_ventas()[:7]
         return context
     
@@ -71,4 +78,25 @@ class ReporteResumenVentas(AdminPermisoMixin, ListView):
             self.request.GET.get("date_end", ''),
         )
         return lista_ventas
+def about(request):
+    return render(request, "home/about.html")
 
+def contact(request):
+    contact_form=ContactForm()
+
+    if request.method=="POST":
+        contact_form=ContactForm(data=request.POST)
+        if contact_form.is_valid():
+            name=request.POST.get('name', '')
+            email=request.POST.get('email', '')
+            content=request.POST.get('content', '')
+
+            email_from=settings.EMAIL_HOST_USER
+
+            recipient_list=["pbellido0401@gmail.com"]
+
+            send_mail(name, content, email_from, recipient_list )
+            #Suponemos que todo a ido bien redireccionamos
+            return redirect(reverse('contact')+"?ok=1")
+
+    return render(request, "home/contact.html", {'form':contact_form})

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+  <h3>📅 Productos próximos a vencer</h3>
+
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Fecha Vencimiento</th>
+          <th>Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in productos %}
+        <tr>
+          <td>{{ producto.name }}</td>
+          <td>{{ producto.category.name }}</td>
+          <td>{{ producto.due_date }}</td>
+          <td>{{ producto.count }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center">✅ No hay productos próximos a vencer</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <a href="{% url 'inicio_app:index-admin' %}" class="btn btn-secondary mt-3">⬅ Volver al Dashboard</a>
+</div>
+{% endblock %}

@@ -1,11 +1,8 @@
 # django
-from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     View,
-    UpdateView,
-    DeleteView,
     DeleteView,
     ListView
 )
@@ -200,7 +197,14 @@ class VentaVoucherPdf(VentasPermisoMixin, View):
             'detalle_productos': detalles,
         }
         pdf = render_to_pdf('venta/voucher.html', data)
-        return HttpResponse(pdf, content_type='application/pdf')
+
+        # 👇 Aquí se aplica la cabecera inline
+        return HttpResponse(
+            pdf,
+            content_type='application/pdf',
+            headers={'Content-Disposition': 'inline; filename="voucher.pdf"'}
+        )
+
     
 
 class SaleListView(VentasPermisoMixin, ListView):
