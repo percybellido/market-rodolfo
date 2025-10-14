@@ -1,6 +1,7 @@
 from django.db import models
+from decimal import Decimal
 from django.conf import settings
-from django.db.models.signals import pre_delete, post_save
+
 from django.utils import timezone
 #
 from model_utils.models import TimeStampedModel
@@ -10,7 +11,6 @@ from applications.producto.models import Product
 
 #
 from .managers import SaleManager, SaleDetailManager, CarShopManager
-#from .signals import update_stok_ventas_producto
 
 
 class Sale(TimeStampedModel):
@@ -45,7 +45,7 @@ class Sale(TimeStampedModel):
 
     date_created = models.DateTimeField(auto_now_add=True)
 
-    count = models.PositiveIntegerField('Cantidad de Productos')
+    count = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     amount = models.DecimalField(
         'Monto', 
         max_digits=10, 
@@ -102,7 +102,7 @@ class SaleDetail(TimeStampedModel):
         verbose_name='Codigo de Venta',
         related_name='detail_sale'
     )
-    count = models.PositiveIntegerField('Cantidad')
+    count = models.DecimalField(max_digits=10, decimal_places=2)
     price_purchase = models.DecimalField(
         'Precio Compra', 
         max_digits=10, 
@@ -132,19 +132,32 @@ class SaleDetail(TimeStampedModel):
 
 
 class CarShop(TimeStampedModel):
-    """Modelo que representa a un carrito de compras"""
+    """Modelo que representa a un carrito de compras asociado a un usuario del sistema"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='carshops',
+        verbose_name='Usuario'
+    )
 
     barcode = models.CharField(
         max_length=13,
-        unique=True
+        null=True,
+        blank=True
     )
+
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
         verbose_name='producto',
         related_name='product_car'
     )
-    count = models.PositiveIntegerField('Cantidad')
+    count = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Cantidad solicitada (permite decimales)"
+    )
     
     objects = CarShopManager()
 
@@ -154,8 +167,7 @@ class CarShop(TimeStampedModel):
         ordering = ['-created']
 
     def __str__(self):
-        return str(self.product.name)
+        return f"{self.user.full_name} → {self.product.name} (x{self.count})"
 
 
-# signals for venta
-#post_save.connect(update_stok_ventas_producto, sender=SaleDetail)
+ 

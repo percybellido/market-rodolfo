@@ -1,6 +1,7 @@
 from model_utils.models import TimeStampedModel
 
 from django.db import models
+from decimal import Decimal
 from django.utils.text import slugify
 
 from .managers import ProductManager
@@ -60,10 +61,25 @@ class Product(TimeStampedModel):
     due_date=models.DateField('fecha de vencimiento', blank=True, null=True)
     description=models.TextField('Descripcion del Producto', blank=True)
     unit=models.CharField('unidad de medida', max_length=1, choices=UNIT_CHOICES)
-    count=models.PositiveIntegerField('Cantidad en Almacén', default=0)
-    purchase_price=models.DecimalField('Precio de Compra', max_digits=7, decimal_places=2)
+    count = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Cantidad disponible en stock (permite decimales, ej. 1.5 kg)"
+    )
+
+    purchase_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="Precio de compra unitario"
+    )
     sale_price=models.DecimalField('Precio de Venta', max_digits=7, decimal_places=2)
-    num_sale=models.PositiveIntegerField('Numero de Ventas', default=0)
+    num_sale = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Cantidad total vendida (permite decimales)"
+    )
     anulate=models.BooleanField('Eliminado', default=False)
     image=models.ImageField(upload_to='uploads/product/', null=True, blank=True)
     # Add Sale Stuff

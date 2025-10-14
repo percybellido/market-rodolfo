@@ -10,16 +10,20 @@ from django.views.generic.edit import (
     FormView
 )
 from django.db.models import F
+from django.db import transaction
 from django.contrib import messages
 # local
 from applications.producto.models import Product
 from applications.utils import render_to_pdf
+from applications.users.models import User
 from applications.users.mixins import VentasPermisoMixin
 #
 from .models import Sale, SaleDetail, CarShop
 from .forms import VentaForm, VentaVoucherForm
 from .functions import procesar_venta
 
+
+from django.db import transaction
 
 class AddCarView(VentasPermisoMixin, FormView):
     template_name = 'venta/index.html'
@@ -28,39 +32,77 @@ class AddCarView(VentasPermisoMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["productos"] = CarShop.objects.all()
-        context["total_cobrar"] = CarShop.objects.total_cobrar()
-        # formulario para venta con voucher
+        user = self.request.user
+        context["productos"] = CarShop.objects.productos_en_carrito(user)
+        context["total_cobrar"] = CarShop.objects.total_cobrar(user)
         context['form_voucher'] = VentaVoucherForm
         return context
-    
-    def form_valid(self, form):
-        barcode = form.cleaned_data['barcode']
-        count = form.cleaned_data['count']
 
-        # Intentamos cargar el producto, si no existe avisamos y volvemos
-        try:
-            producto = Product.objects.get(barcode=barcode)
-        except Product.DoesNotExist:
+    @transaction.atomic
+    def form_valid(self, form):
+        user = self.request.user
+        barcode = form.cleaned_data.get('barcode')
+        product = form.cleaned_data.get('product')
+        count = form.cleaned_data.get('count')
+
+        # 🧩 Caso 1: con código de barras
+        if barcode:
+            try:
+                product_obj = Product.objects.get(barcode=barcode)
+            except Product.DoesNotExist:
+                messages.error(
+                    self.request,
+                    f"❌ El código de barras '{barcode}' no corresponde a ningún producto.",
+                    extra_tags='danger'
+                )
+                return HttpResponseRedirect(reverse('venta_app:venta-index'))
+
+        # 🧩 Caso 2: sin código de barras
+        elif product:
+            productos = Product.objects.filter(
+                barcode__isnull=True,
+                name__icontains=product
+            )
+            if productos.count() == 1:
+                product_obj = productos.first()
+            elif productos.count() > 1:
+                messages.warning(
+                    self.request,
+                    f"⚠️ Se encontraron {productos.count()} coincidencias para '{product}', refine la búsqueda.",
+                    extra_tags='warning'
+                )
+                return HttpResponseRedirect(reverse('venta_app:venta-index'))
+            else:
+                messages.error(
+                    self.request,
+                    f"❌ No se encontró ningún producto llamado '{product}'.",
+                    extra_tags='danger'
+                )
+                return HttpResponseRedirect(reverse('venta_app:venta-index'))
+        else:
             messages.error(
                 self.request,
-                f"❌ El código de barras '{barcode}' no corresponde a ningún producto.",
+                "❌ Debes ingresar un código de barras o el nombre del producto.",
                 extra_tags='danger'
             )
             return HttpResponseRedirect(reverse('venta_app:venta-index'))
-        
+
+        # 🧾 Agregar o actualizar producto en el carrito del usuario
+        barcode_value = product_obj.barcode or None
+
         obj, created = CarShop.objects.get_or_create(
-            barcode=barcode,
-            defaults={
-                'product': Product.objects.get(barcode=barcode),
-                'count': count
-            }
+            user=user,
+            product=product_obj,
+            defaults={'count': count, 'barcode': barcode_value}
         )
-        #
+
         if not created:
             obj.count = obj.count + count
-            obj.save()
-        return super(AddCarView, self).form_valid(form)
+            obj.save(update_fields=['count'])
+
+        return super().form_valid(form)
+
+
     
 class CarShopAddView(VentasPermisoMixin, View):
     """ aumenta en 1 la cantidad en un carshop """
@@ -95,24 +137,26 @@ class CarShopDeleteView(VentasPermisoMixin, DeleteView):
     model = CarShop
     success_url = reverse_lazy('venta_app:venta-index')
 
+    def get_queryset(self):
+        # Evita que un usuario borre productos del carrito de otro
+        return CarShop.objects.filter(user=self.request.user)
+
+
 
 class CarShopDeleteAll(VentasPermisoMixin, View):
-    
+
     def post(self, request, *args, **kwargs):
-        #
-        CarShop.objects.all().delete()
-        #
-        return HttpResponseRedirect(
-            reverse(
-                'venta_app:venta-index'
-            )
-        )
+        CarShop.objects.limpiar_carrito(request.user)
+        return HttpResponseRedirect(reverse('venta_app:venta-index'))
+
 
 
 class ProcesoVentaSimpleView(VentasPermisoMixin, View):
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         # 1. Recojo el carrito
-        productos_en_car = CarShop.objects.select_related('product').all()
+        user=self.request.user
+        productos_en_car = CarShop.objects.productos_en_carrito(self.request.user)
 
         # 2. Busco todos los problemas de stock
         faltantes = []
@@ -139,7 +183,7 @@ class ProcesoVentaSimpleView(VentasPermisoMixin, View):
             self=self,
             type_invoce=Sale.SIN_COMPROBANTE,
             type_payment=Sale.CASH,
-            user=self.request.user,
+            user=user,
         )
         messages.success(request, "✔️ Venta procesada correctamente.", extra_tags='success')
         return HttpResponseRedirect(reverse('venta_app:venta-index'))
@@ -148,9 +192,11 @@ class ProcesoVentaVoucherView(VentasPermisoMixin, FormView):
     form_class  = VentaVoucherForm
     success_url = '.'
 
+    @transaction.atomic
     def form_valid(self, form):
+        user=self.request.user
         # 1. Pre-check de stock
-        productos_en_car = CarShop.objects.select_related('product').all()
+        productos_en_car = CarShop.objects.productos_en_carrito(self.request.user)
         faltantes = []
         for item in productos_en_car:
             if item.count > item.product.count:
@@ -172,7 +218,7 @@ class ProcesoVentaVoucherView(VentasPermisoMixin, FormView):
             self=self,
             type_invoce=type_invoce,
             type_payment=type_payment,
-            user=self.request.user,
+            user=user,
         )
 
         if venta:

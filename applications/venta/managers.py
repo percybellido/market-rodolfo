@@ -6,7 +6,7 @@ from django.db import models
 #
 from applications.producto.models import Product
 
-from django.db.models import Q, Sum, F, FloatField, ExpressionWrapper
+from django.db.models import Q, Sum, F, FloatField, ExpressionWrapper, DecimalField
 
 
 class SaleManager(models.Manager):
@@ -120,13 +120,13 @@ class SaleDetailManager(models.Manager):
             )
             .values('sale__date_sale__date')
             .annotate(
-                total_vendido=Sum(
+                total_vendido = Sum(
                     F('price_sale') * F('count'),
-                    output_field=FloatField()
+                    output_field=DecimalField(max_digits=15, decimal_places=2)
                 ),
                 total_ganancias=Sum(
                     F('price_sale') * F('count') - F('price_purchase') * F('count'),
-                    output_field=FloatField()
+                    output_field=DecimalField(max_digits=15, decimal_places=2)
                 ),
                 num_ventas=Sum('count'),
             )
@@ -143,7 +143,7 @@ class SaleDetailManager(models.Manager):
             total_ventas=Sum(F('price_sale')*F('count'), output_field=FloatField()),
             ganancia_total=Sum(
                 F('price_sale')*F('count') - F('price_purchase')*F('count'),
-                output_field=FloatField()
+                output_field=DecimalField(max_digits=15, decimal_places=2)
             )
         ).order_by('-sale__date_sale__date__month')
     
@@ -154,17 +154,31 @@ class SaleDetailManager(models.Manager):
 class CarShopManager(models.Manager):
     """ procedimiento modelo Carrito de compras """
     
-    def total_cobrar(self):
+    def total_cobrar(self, user=None):
+        """
+        Calcula el total a cobrar del carrito de un usuario específico.
+        Si no se pasa usuario, retorna 0.
+        """
+        if not user:
+            return 0
         
-        consulta = self.aggregate(
+        consulta = self.filter(user=user).aggregate(
             total=Sum(
-                F('count')*F('product__sale_price'),
-                output_field=FloatField()
+                F('count') * F('product__sale_price'),
+                output_field=DecimalField(max_digits=15, decimal_places=2)
             ),
         )
-        if consulta['total']:
-            return consulta['total']
-        else:
-            return 0            
+        return consulta['total'] or 0      
 
+    def limpiar_carrito(self, user):
+        """
+        Elimina todos los productos del carrito del usuario actual.
+        """
+        self.filter(user=user).delete()
+
+    def productos_en_carrito(self, user):
+        """
+        Retorna los productos del carrito de un usuario con sus datos relacionados.
+        """
+        return self.filter(user=user).select_related('product')
             
