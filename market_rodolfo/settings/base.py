@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'ckeditor',
+    'imagekit',
     
     #Local Apps
     'applications.users',

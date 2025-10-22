@@ -1,46 +1,38 @@
-#
 from decimal import Decimal
-from django.utils import timezone
-from django.db.models import Prefetch
-#
-from applications.producto.models import Product
-from applications.users.models import User
-#
-from .models import Sale, SaleDetail, CarShop
-
-
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
-from django.db.models import F, Prefetch
+
 from applications.producto.models import Product
-from applications.users.models import User
 from .models import Sale, SaleDetail, CarShop
 
 
 def procesar_venta(user, **params_venta):
     """
-    Procesa la venta para el usuario actual de forma atómica y optimizada.
+    Procesa la venta para el usuario actual de forma atómica, segura y optimizada.
     """
 
-    # Prefetch para evitar consultas N+1
-    productos_en_car = (
-        CarShop.objects
-        .filter(user=user)
-        .select_related('product')
-    )
+    with transaction.atomic():  # Bloquea todo este proceso
+        # 🔒 Bloqueamos los productos del carrito (y sus productos asociados)
+        productos_en_car = (
+            CarShop.objects
+            .select_related('product')
+            .filter(user=user)
+            .select_for_update(of=('product',))
+        )
 
-    if not productos_en_car.exists():
-        return None
+        if not productos_en_car.exists():
+            return None
 
-    # ✅ Validación de stock en una sola pasada
-    for item in productos_en_car:
-        if item.count > item.product.count:
-            raise ValueError(
-                f"Stock insuficiente para '{item.product.name}'. "
-                f"Disponible: {item.product.count}, solicitado: {item.count}"
-            )
+        # ✅ Validación de stock dentro de la transacción
+        for item in productos_en_car:
+            if item.count > item.product.count:
+                raise ValueError(
+                    f"Stock insuficiente para '{item.product.name}'. "
+                    f"Disponible: {item.product.count}, solicitado: {item.count}"
+                )
 
-    with transaction.atomic():  # 👈 evita inconsistencias si algo falla
+        # 🔢 Crear venta principal
         venta = Sale.objects.create(
             date_sale=timezone.now(),
             count=Decimal('0.00'),
@@ -52,7 +44,6 @@ def procesar_venta(user, **params_venta):
 
         detalles = []
         productos_actualizados = []
-
         total_cantidad = Decimal('0.00')
         total_monto = Decimal('0.00')
 
@@ -72,7 +63,7 @@ def procesar_venta(user, **params_venta):
                 )
             )
 
-            # Actualización del stock en memoria
+            # 🔁 Actualizamos stock y número de ventas (seguro dentro del bloqueo)
             producto.count = F('count') - cantidad
             producto.num_sale = F('num_sale') + cantidad
             productos_actualizados.append(producto)
@@ -80,18 +71,16 @@ def procesar_venta(user, **params_venta):
             total_cantidad += cantidad
             total_monto += cantidad * precio_venta
 
-        # Guardamos la venta actualizada
+        # ✅ Guardar totales de la venta
         venta.count = round(total_cantidad, 2)
         venta.amount = round(total_monto, 2)
         venta.save()
 
-        # Guardamos detalles y actualizamos productos
+        # 💾 Guardar detalles y actualizar productos
         SaleDetail.objects.bulk_create(detalles)
         Product.objects.bulk_update(productos_actualizados, ['count', 'num_sale'])
 
-        # Eliminamos carrito del usuario
+        # 🧹 Eliminar carrito
         productos_en_car.delete()
 
         return venta
-
-    

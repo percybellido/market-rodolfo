@@ -1,45 +1,104 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Blog{% endblock %} 
-{% block background %}{% load static %}{% static 'core/img/my_blog2.jpg' %}{% endblock %}
+{% block title %}Blog - {{ category.name }}{% endblock %}
+
+{% block background %}
+  {% static 'core/img/my_blog2.jpg' %}
+{% endblock %}
 
 {% block headers %}
-<h1>Mi Blog</h1>
-<span class="subheading">Currículo</span>
+  <h1>Mi Blog</h1>
+  <span class="subheading">Categoría: {{ category.name }}</span>
 {% endblock %}
 
 {% block content %}
-    
-    {% for post in category.get_posts.all %}
-    <section class="page-section cta">
-        <div class="container">
-          <div class="row">
-            <div class="col-xl-9 mx-auto">
-              <div class="cta-innerv text-center rounded">
-                <h2 class="section-heading mb-5">
-                  <span class="section-heading-upper">{{post.created|date:"SHORT_DATE_FORMAT"}}</span>
-                  <span class="section-heading-lower">{{post.title}}</span>
-                </h2>
-                <p class="mb-0">
-                  <img class="mx-auto d-flex rounded img-fluid mb-3 mb-lg-0" src="{{post.image.url}}" alt="">
-                </p>
-                <p class="mb-0 mbt">
-                  {{post.content|safe}}
-                </p>
-                <p class="mb-0 mbt">
-                    <span class="section-heading-under">Publicado por <em><b>{{post.author}}</b></em> en 
-                    <em>
-                      {% for category in post.categories.all %}
-                      <a href="{% url 'blog_app:category' category.id %}" class="link">{{category.name}}</a>{% if not forloop.last %},{% endif %}
-                      {% endfor %}
-                    </em>
-                    <span>
-                </p>
-              </div>
-  
+<section class="py-5 bg-light">
+  <div class="container text-center mb-5">
+    <h2 class="fw-bold text-dark">
+      🗂️ Publicaciones en "{{ category.name }}"
+    </h2>
+    <p class="text-muted">Explora los artículos más recientes de esta categoría</p>
+  </div>
+
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      {% for post in category.get_posts.all %}
+      <div class="col-12 col-md-10 col-lg-8">
+        <article class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 hover-card">
+
+          <!-- Imagen superior -->
+          {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" 
+                 class="card-img-top img-fluid blog-img">
+          {% else %}
+            <img src="{% static 'img/no-image.jpg' %}" alt="Sin imagen" 
+                 class="card-img-top img-fluid blog-img">
+          {% endif %}
+
+          <!-- Contenido -->
+          <div class="card-body p-4 text-center">
+            <h5 class="text-muted mb-2">{{ post.created|date:"d M, Y" }}</h5>
+            <h2 class="fw-bold mb-3 text-dark">{{ post.title }}</h2>
+
+            <div class="post-content mb-3 text-justify">
+              {{ post.content|safe|truncatewords:50 }}
             </div>
+
+            <p class="mb-3 text-secondary small">
+              Publicado por <b class="text-warning">{{ post.author }}</b> en 
+              {% for cat in post.categories.all %}
+                <a href="{% url 'blog_app:category' cat.id %}" class="link fw-semibold">{{ cat.name }}</a>{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+
+           
           </div>
+        </article>
+      </div>
+      {% empty %}
+        <div class="text-center py-5">
+          <h5 class="text-muted">😕 No hay publicaciones en esta categoría aún.</h5>
         </div>
-      </section>
-    {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Estilos -->
+<style>
+  .hover-card {
+    transition: all 0.3s ease;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+
+  /* Imagen proporcional, sin recortes */
+  .blog-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    background-color: #f8f9fa;
+  }
+
+  .post-content {
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .btn-dark:hover {
+    background-color: #343a40 !important;
+    transform: translateY(-2px);
+    transition: 0.2s ease;
+  }
+
+  @media (max-width: 768px) {
+    .card-body {
+      padding: 1.5rem;
+    }
+  }
+</style>
 {% endblock %}

@@ -1,22 +1,46 @@
-<div class="row mb-4 d-flex justify-content-between">
-    <div class="col-md-4">
-      <div class="bg-success text-white text-center p-3 rounded">
-        <a class="{% if request.resolver_match.url_name == 'admin-reporte' %}fw-bold text-decoration-underline{% endif %}" 
-           href="{% url 'inicio_app:admin-reporte' %}" 
-           style="font-size: 16px; color: white;">
-          Informe de Ingresos
-        </a>
-      </div>
-    </div>
-    
-    <div class="col-md-4">
-      <div class="bg-success text-white text-center p-3 rounded">
-        <a class="{% if request.resolver_match.url_name == 'admin-resumen_ventas' %}fw-bold text-decoration-underline{% endif %}" 
-           href="{% url 'inicio_app:admin-resumen_ventas' %}" 
-           style="font-size: 16px; color: white;">
-          Resumen Ventas
-        </a>
-      </div>
-    </div>
+<div class="row g-3 mb-4 justify-content-center justify-content-md-between text-center text-md-start">
+
+  <!-- Opción: Informe de Ingresos -->
+  <div class="col-12 col-sm-6 col-md-4">
+    <a href="{% url 'inicio_app:admin-reporte' %}"
+       class="d-block bg-success text-white p-3 rounded text-decoration-none h-100 shadow-sm 
+              {% if request.resolver_match.url_name == 'admin-reporte' %}fw-bold border border-light{% endif %}">
+      <span class="d-block fs-6">📊 Informe de Ingresos</span>
+    </a>
+  </div>
+
+  <!-- Opción: Resumen Ventas -->
+  <div class="col-12 col-sm-6 col-md-4">
+    <a href="{% url 'inicio_app:admin-resumen_ventas' %}"
+       class="d-block bg-success text-white p-3 rounded text-decoration-none h-100 shadow-sm 
+              {% if request.resolver_match.url_name == 'admin-resumen_ventas' %}fw-bold border border-light{% endif %}">
+      <span class="d-block fs-6">💵 Resumen Ventas</span>
+    </a>
+  </div>
 </div>
+
+<style>
+  @media (max-width: 768px) {
+    .row > div a {
+      font-size: 0.95rem !important;
+      padding: 0.9rem !important;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .row > div {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    .row > div a {
+      font-size: 0.9rem !important;
+    }
+  }
+
+  a.bg-success:hover {
+    background-color: #157347 !important;
+    transition: background-color 0.3s ease;
+  }
+</style>
+
   

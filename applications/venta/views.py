@@ -35,7 +35,7 @@ class AddCarView(VentasPermisoMixin, FormView):
         user = self.request.user
         context["productos"] = CarShop.objects.productos_en_carrito(user)
         context["total_cobrar"] = CarShop.objects.total_cobrar(user)
-        context['form_voucher'] = VentaVoucherForm
+        context['form_voucher'] = VentaVoucherForm()
         return context
 
     @transaction.atomic

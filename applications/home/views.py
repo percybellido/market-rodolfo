@@ -4,7 +4,7 @@ from django.views.generic import (
     ListView
 )
 from applications.venta.models import Sale, SaleDetail
-from applications.producto.models import Product
+from applications.producto.models import Product, Lote
 from applications.users.mixins import AdminPermisoMixin
 #
 from .forms import LiquidacionProviderForm, ResumenVentasForm
@@ -30,7 +30,7 @@ class PanelAdminView(AdminPermisoMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["total_ventas"] = Sale.objects.total_ventas_dia()
         context["total_anulaciones"] = Sale.objects.total_ventas_anuladas_dia()
-        context["por_vencer"] = Product.objects.productos_por_vencer().count()
+        context["por_vencer"] = Lote.objects.productos_por_vencer().count()
         context["resumen_semana"] = SaleDetail.objects.resumen_ventas()[:7]
         return context
     

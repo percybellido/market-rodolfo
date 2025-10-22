@@ -17,39 +17,41 @@
   {% endif %}
 
   <!-- Formulario de ingreso de productos -->
-  <div class="row mb-3 mt-3">
-    <form class="col-md-8 row g-2 align-items-center" method="POST">
+  <div class="row mb-3 mt-3 g-3">
+    <form class="col-12 col-md-8 row g-2 align-items-end" method="POST">
       {% csrf_token %}
 
       <!-- Código de barras -->
-      <div class="col-md-4">
+      <div class="col-12 col-sm-6 col-md-4">
         <label class="form-label">Código de barras:</label>
         {{ form.barcode }}
       </div>
 
       <!-- Producto sin código -->
-      <div class="col-md-4">
+      <div class="col-12 col-sm-6 col-md-4">
         <label class="form-label">Producto (sin código):</label>
-        {{ form.product}}
+        {{ form.product }}
       </div>
 
       <!-- Cantidad -->
-      <div class="col-md-2">
+      <div class="col-6 col-sm-4 col-md-2">
         <label class="form-label">Cantidad:</label>
         {{ form.count }}
       </div>
 
       <!-- Botón Agregar -->
-      <div class="col-md-2 d-grid">
-        <label class="form-label">&nbsp;</label>
-        <button type="submit" class="btn btn-secondary">Agregar</button>
+      <div class="col-6 col-sm-4 col-md-2 d-grid">
+        <label class="form-label d-none d-md-block">&nbsp;</label>
+        <button type="submit" class="btn btn-secondary">
+          <i class="bi bi-cart-plus"></i> Agregar
+        </button>
       </div>
     </form>
 
     <!-- Últimas ventas -->
-    <div class="col-md-4">
-      <a class="btn btn-outline-secondary w-100" href="{% url 'venta_app:venta-list' %}">
-        <i class="bi bi-clock-history"></i>
+    <div class="col-12 col-md-4 mt-3 mt-md-0">
+      <a class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center" href="{% url 'venta_app:venta-list' %}">
+        <i class="bi bi-clock-history me-2"></i>
         <span>Últimas Ventas</span>
       </a>
     </div>
@@ -57,68 +59,70 @@
 
   <!-- Tabla del carrito -->
   <div class="row">
-    <div class="col-md-8">
-      <h5>Productos en Carrito</h5>
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th scope="col">COD</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Precio (S/)</th>
-            <th scope="col">Cantidad</th>
-            <th colspan="3" class="text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for producto in productos %}
+    <div class="col-12 col-md-8">
+      <h5 class="mb-3">Productos en Carrito</h5>
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
             <tr>
-              <td>{{ producto.barcode }}</td>
-              <td>{{ producto.product.name }}</td>
-              <td>{{ producto.product.sale_price }}</td>
-              <td>{{ producto.count }}</td>
-
-              <!-- Agregar -->
-              <td>
-                <form action="{% url 'venta_app:carshop-add' producto.id %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-info"><i class="bi bi-plus"></i></button>
-                </form>
-              </td>
-
-              <!-- Disminuir -->
-              <td>
-                <form action="{% url 'venta_app:carshop-update' producto.id %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-primary"><i class="bi bi-dash"></i></button>
-                </form>
-              </td>
-
-              <!-- Eliminar -->
-              <td>
-                <form action="{% url 'venta_app:carshop-delete' producto.id %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-danger"><i class="bi bi-x"></i></button>
-                </form>
-              </td>
+              <th scope="col">COD</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Precio (S/)</th>
+              <th scope="col">Cantidad</th>
+              <th colspan="3" class="text-center">Acciones</th>
             </tr>
-          {% empty %}
-            <tr>
-              <td colspan="7" class="text-center text-muted">No hay productos en el carrito.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {% for producto in productos %}
+              <tr>
+                <td>{{ producto.barcode }}</td>
+                <td class="text-truncate" style="max-width: 180px;">{{ producto.product.name }}</td>
+                <td>{{ producto.product.sale_price }}</td>
+                <td>{{ producto.count }}</td>
+
+                <!-- Agregar -->
+                <td>
+                  <form action="{% url 'venta_app:carshop-add' producto.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-info"><i class="bi bi-plus"></i></button>
+                  </form>
+                </td>
+
+                <!-- Disminuir -->
+                <td>
+                  <form action="{% url 'venta_app:carshop-update' producto.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-dash"></i></button>
+                  </form>
+                </td>
+
+                <!-- Eliminar -->
+                <td>
+                  <form action="{% url 'venta_app:carshop-delete' producto.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-x"></i></button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="7" class="text-center text-muted">No hay productos en el carrito.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Panel lateral -->
-    <div class="col-md-4 mb-3">
-      <div class="alert alert-success text-center">
+    <div class="col-12 col-md-4 mt-4 mt-md-0">
+      <div class="alert alert-success text-center shadow-sm">
         <h5>Total a Cobrar:</h5>
-        <h2>S/ {{ total_cobrar }}</h2>
+        <h2 class="fw-bold">S/ {{ total_cobrar |floatformat:"2" }}</h2>
       </div>
 
       <!-- Botones de venta -->
-      <form action="{% url 'venta_app:venta-simple' %}" method="POST">
+      <form action="{% url 'venta_app:venta-simple' %}" method="POST" class="mb-2">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary w-100 mb-2">
           <i class="bi bi-cash-coin"></i> Pagar Sin Comprobante
@@ -141,10 +145,10 @@
 
   <!-- Modal de comprobante -->
   <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Detalle del comprobante de pago</h5>
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title fw-semibold" id="exampleModalLabel">Detalle del comprobante de pago</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <form action="{% url 'venta_app:venta-voucher' %}" method="POST">
@@ -173,7 +177,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Pagar</button>
+            <button type="submit" class="btn btn-success w-100">Pagar</button>
           </div>
         </form>
       </div>

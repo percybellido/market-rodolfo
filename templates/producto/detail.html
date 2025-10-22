@@ -1,35 +1,68 @@
 {% extends "base.html" %}
-
-{% load  static %}
+{% load static %}
 
 {% block content %}
+<div class="container py-5">
+  <h3 class="text-center mb-4 text-uppercase fw-bold text-secondary">
+    Detalle del Producto
+  </h3>
 
-<div class="row detalle">
-  <h3 class="col mt-3" style="margin-bottom: 1em; text-align: center;">Detalle del producto</h3>  
-  <div class="row">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                    <h4>{{ product.name }}</h4>
-                    <p><span style="font-weight: bold;">Codigo de Barras:</span> {{ object.barcode }}</p>
-                    <p><span style="font-weight: bold;">Proveedor:</span> {{ product.provider }}</p>
-                    <p><span style="font-weight: bold;">Marca:</span> {{ product.marca }}</p>
-                    <p><span style="font-weight: bold;">Vencimiento:</span> {{ product.due_date }}</p>
-                    <p><span style="font-weight: bold;">Unidad de medida:</span> {{ product.get_unit_display }}</p>
-                    <p><span style="font-weight: bold;">Cantidad en Almacen:</span> {{ product.count }}</p>
-                    <p><span style="font-weight: bold;">Precio Compra:</span> {{ product.purchase_price }}</p>
-                    <p><span style="font-weight: bold;">Precio Venta:</span> {{ product.sale_price }}</p>
-                    <p><span style="font-weight: bold;">Numero de Ventas:</span> {{ product.num_sale }}</p>
-                    <p><span style="font-weight: bold;">Descripcion:</span> {{ product.description }}</p>
-                    </div>
-                </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="row g-0 align-items-center">
+
+          <!-- Imagen del producto -->
+            <div class="col-md-5 bg-light d-flex align-items-center justify-content-center p-3">
+            {% if product.thumbnail_medium %}
+                <img src="{{ product.thumbnail_medium.url }}" 
+                    alt="{{ product.name }}" 
+                    class="img-fluid rounded-3 shadow-sm" 
+                    style="max-height: 280px; object-fit: contain;">
+            {% elif product.image %}
+                <img src="{{ product.image.url }}" 
+                    alt="{{ product.name }}" 
+                    class="img-fluid rounded-3 shadow-sm" 
+                    style="max-height: 280px; object-fit: contain;">
+            {% else %}
+                <img src="{% static 'img/no-image.jpg' %}" 
+                    alt="Sin imagen" 
+                    class="img-fluid rounded-3 shadow-sm" 
+                    style="max-height: 280px; object-fit: contain;">
+            {% endif %}
             </div>
-        </div>
-    </div>
-              
-    </div>
-</div>
 
+          <!-- Información del producto -->
+          <div class="col-md-7 p-4">
+            <h4 class="fw-bold text-dark mb-3">{{ product.name }}</h4>
+
+            <ul class="list-unstyled">
+              
+              <li><strong>Proveedor:</strong> {{ product.provider|default:"-" }}</li>
+              <li><strong>Marca:</strong> {{ product.marca|default:"-" }}</li>
+              <li><strong>Cantidad en almacén:</strong> {{ product.count }}</li>
+              
+              <li><strong>Precio venta:</strong> <span class="text-success fw-bold">{{ product.sale_price }} S/.</span></li>
+              
+              {% if product.fecha_vencimiento_proxima %}
+                <li><strong>Vencimiento:</strong> {{ product.fecha_vencimiento_proxima }}</li>
+              {% endif %}
+              <li><strong>Descripción:</strong><br>{{ product.description|default:"Sin descripción" }}</li>
+            </ul>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <a href="{% url 'producto_app:product-list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+              </a>
+              <a href="{% url 'producto_app:producto-update' product.id %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Editar
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Product, Category
+from .models import Product, Category, Lote
 from django.urls import reverse_lazy
 from django.views.generic import (
     ListView,
@@ -70,6 +70,7 @@ class CategoryProductListView(ListView):
     model = Product
     template_name = "producto/category_list.html"
     context_object_name = "products"  # más consistente con los templates
+    paginate_by=8
 
     def get_queryset(self):
         category_slug = self.kwargs.get('slug')
@@ -85,5 +86,6 @@ class CategoryProductListView(ListView):
         return context
 
 def productos_por_vencer_view(request):
-    productos = Product.objects.productos_por_vencer()  # usando tu ProductManager
-    return render(request, "producto/por_vencer.html", {"productos": productos})
+    lotes_por_vencer = Lote.objects.productos_por_vencer()
+    context = {"lotes": lotes_por_vencer}
+    return render(request, "producto/por_vencer.html", context)

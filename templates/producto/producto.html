@@ -1,84 +1,96 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Market Rodolfo{% endblock %}
 
-{% load static %}
-
 {% block content %}
-<section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            {% for product in products %}
-                {% if product.is_sale %}
-                
-                <div class="col mb-5">
-                    <div class="card h-100">
-                        <!-- Sale badge-->
-                        <div class="badge bg-card text-black position-absolute"
-                        style="top: 0.5rem; right: 0.5rem">Sale</div>
-                        <!-- Product image-->
-                        <img class="card-img-top" src="{{product.image.url}}" alt="..." />
-                        <!-- Product details-->
-                        <div class="card-body p-4">
-                            <div class="text-center">
-                                <!-- Product name-->
-                                <h5 class="fw-bolder">{{product.name}}</h5>
-                                <!--Sale-->
-                                <div class="d-flex justify-content-center small text-success mb-2">
-                                    <div class="bi-star-fill"></div>
-                                    &nbsp;&nbsp;Agotado!&nbsp;&nbsp;
-                                    <div class="bi-star-fill"></div>
-                                </div>
-                                <!-- Product price-->
-                                <strike>
-                                ${{product.price}}
-                                </strike>
-                                &nbsp;
-                                ${{product.sale_price}}
-                                &nbsp;<br/>
-                                {{product.description}}
-                                <br/>
-                                
-                            </div>
-                        </div>
-                        <!-- Product actions-->
-                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                            <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'producto_app:producto-detail' product.id %}">View Product</a></div>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="col mb-5">
-                    <div class="card h-100">
-                        
-                        <!-- Product image-->
-                        <img class="card-img-top" src="{{product.image.url}}" alt="..." />
-                        <!-- Product details-->
-                        <div class="card-body p-4">
-                            <div class="text-center">
-                                <!-- Product name-->
-                                <h5 class="fw-bolder">{{product.name}}</h5>
-                                
-                                <!-- Product price-->
-                            
-                                ${{product.price}}
-                                &nbsp;<br/>
-                            
-                                {{product.description}}
-                                <br/>
-                                
-                            </div>
-                        </div>
-                        <!-- Product actions-->
-                        <div class="card-footer p-4 pt-0 border-top-0">
-                            <div class="text-center"><a class="btn btn-outline-dark mt-auto bg-dark text-white" href="{% url 'producto_app:producto-detail' product.id %}">View Product</a></div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            {% endfor %}
-            </div>
-        </div>
-    </section>
+<section class="py-5 bg-light">
+  <div class="container px-4 px-lg-5 mt-4">
+    <h2 class="text-center mb-5 fw-bold text-uppercase">
+      🛍️ Nuestros Productos
+    </h2>
 
+    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+      {% for product in products %}
+      <div class="col mb-5">
+        <div class="card h-100 shadow-sm border-0 product-card">
+
+          <!-- Etiqueta SALE o AGOTADO -->
+          {% if product.is_sale %}
+          <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-3 py-2 fs-6">
+            Oferta 🔥
+          </span>
+          {% endif %}
+          {% if product.count == 0 %}
+          <span class="badge bg-secondary position-absolute top-0 end-0 m-2 px-3 py-2 fs-6">
+            Agotado ❌
+          </span>
+          {% endif %}
+
+          <!-- Imagen del producto -->
+          <img class="card-img-top img-fluid" src="{{ product.image.url }}" alt="{{ product.name }}" style="height: 220px; object-fit: cover;">
+
+          <!-- Detalles -->
+          <div class="card-body p-3 text-center">
+            <h5 class="fw-bold text-dark mb-2">{{ product.name }}</h5>
+
+            {% if product.is_sale %}
+            <p class="text-muted mb-1">
+              <strike>${{ product.price }}</strike>
+              <span class="text-danger fw-bold ms-2">${{ product.sale_price }}</span>
+            </p>
+            {% else %}
+            <p class="text-dark fw-bold mb-1">${{ product.price }}</p>
+            {% endif %}
+
+            <p class="text-muted small mb-0">{{ product.description|truncatechars:60 }}</p>
+          </div>
+
+          <!-- Acciones -->
+          <div class="card-footer border-top-0 bg-transparent text-center pb-4">
+            <a class="btn btn-dark w-75 rounded-pill shadow-sm transition"
+               href="{% url 'producto_app:producto-detail' product.id %}">
+              Ver detalle
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center">
+        <p class="fs-5 text-muted">No hay productos disponibles en este momento 💤</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ==== Estilos personalizados ==== */
+  .product-card {
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .transition {
+    transition: all 0.3s ease;
+  }
+
+  .btn-dark:hover {
+    background-color: #212529;
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 576px) {
+    .card-img-top {
+      height: 180px;
+    }
+    h5 {
+      font-size: 1rem;
+    }
+  }
+</style>
 {% endblock %}

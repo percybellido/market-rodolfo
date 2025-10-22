@@ -13,7 +13,6 @@ class ProductForm(forms.ModelForm):
             'name',
             'provider',
             'marca',
-            'due_date',
             'description',
             'unit',
             'count',
@@ -31,13 +30,6 @@ class ProductForm(forms.ModelForm):
             'name': forms.TextInput(
                 attrs = {
                     'placeholder': 'Nombre...',
-                    'class': 'form-control',
-                }
-            ),
-            'due_date': forms.DateInput(
-                format='%Y-%m-%d',
-                attrs = {
-                    'type': 'date',
                     'class': 'form-control',
                 }
             ),

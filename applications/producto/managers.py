@@ -1,9 +1,10 @@
 # python
-from datetime import timedelta
+from datetime import date, timedelta
 # django
 from django.utils import timezone
 from django.db import models
 
+from django.shortcuts import render
 from django.db.models import Q, F
 
 class ProductManager(models.Manager):
@@ -59,12 +60,19 @@ class ProductManager(models.Manager):
             #
             return consulta
     
-    def productos_por_vencer(self, dias=200):
+class LoteManager(models.Manager):
+    from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+
+class LoteManager(models.Manager):
+    def productos_por_vencer(self, dias=30):
         """
-        Retorna productos cuya fecha de vencimiento está dentro de los próximos `dias` días.
-        Por defecto, 10 días.
+        Retorna un queryset de lotes cuya fecha de vencimiento está dentro de los próximos `dias` días.
         """
         hoy = timezone.now().date()
         limite = hoy + timedelta(days=dias)
-        por_vencer= self.filter(due_date__range=(hoy, limite)).order_by('due_date')
-        return por_vencer
+        return self.filter(
+            expiration_date__range=(hoy, limite),
+            count__gt=0
+        ).select_related('product').order_by('expiration_date')

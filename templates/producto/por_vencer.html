@@ -11,17 +11,17 @@
         <tr>
           <th>Producto</th>
           <th>Categoría</th>
-          <th>Fecha Vencimiento</th>
+          <th>Fecha de Vencimiento</th>
           <th>Stock</th>
         </tr>
       </thead>
       <tbody>
-        {% for producto in productos %}
+        {% for lote in lotes %}
         <tr>
-          <td>{{ producto.name }}</td>
-          <td>{{ producto.category.name }}</td>
-          <td>{{ producto.due_date }}</td>
-          <td>{{ producto.count }}</td>
+          <td>{{ lote.product.name }}</td>
+          <td>{{ lote.product.category.name }}</td>
+          <td>{{ lote.expiration_date }}</td>
+          <td>{{ lote.count }}</td>
         </tr>
         {% empty %}
         <tr>

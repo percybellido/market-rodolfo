@@ -1,46 +1,182 @@
 {% extends "base.html" %}
-
 {% load static %}
 
+{% block title %}Catálogo de Productos{% endblock %}
+
 {% block content %}
-<h2 class="text-center m-4 producto">Nuestros Productos</h2>
+<section class="py-4 bg-light">
+  <div class="container">
 
-<!-- Menú de categorías -->
-<ul class="nav nav-pills mb-3">
-    <li class="nav-item">
-        <a class="nav-link {% if not current_slug %}active{% endif %}" href="{% url 'producto_app:product-list' %}">Todas</a>
-    </li>
-    {% for cat in categories %}
-        <li class="nav-item">
-            <a class="nav-link text-uppercase{% if current_slug == cat.slug %}active{% endif %}" href="{% url 'producto_app:product-category' cat.slug %}">
-                {{ cat.name }}
+    <!-- Título principal -->
+    <h2 class="text-center mb-4 fw-bold text-dark">
+      🛍️ Nuestros Productos
+    </h2>
+
+    <!-- Filtro por categoría -->
+    <ul class="nav nav-pills justify-content-center flex-wrap mb-4">
+      <li class="nav-item">
+        <a class="nav-link {% if not current_slug %}active{% endif %}" 
+           href="{% url 'producto_app:product-list' %}">
+          Todas
+        </a>
+      </li>
+      {% for cat in categories %}
+      <li class="nav-item">
+        <a class="nav-link text-uppercase {% if current_slug == cat.slug %}active{% endif %}" 
+           href="{% url 'producto_app:product-category' cat.slug %}">
+          {{ cat.name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <!-- Catálogo de productos -->
+    <div class="row g-4 justify-content-center">
+      {% for product in products %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3 d-flex">
+        <div class="card shadow-sm border-0 h-100 w-100 hover-card">
+
+          <!-- Imagen -->
+          <div class="image-container d-flex align-items-center justify-content-center bg-white p-3">
+            {% if product.image %}
+              {# Usar thumbnail_small si existe (genera la miniatura por ImageKit/equivalente) #}
+              <img src="{{ product.thumbnail_small.url }}" class="card-img-top" alt="{{ product.name }}" loading="lazy">
+            {% else %}
+              <img src="{% static 'img/no-image.jpg' %}" class="card-img-top" alt="Sin imagen" loading="lazy">
+            {% endif %}
+          </div>
+
+          <!-- Cuerpo -->
+          <div class="card-body text-center d-flex flex-column">
+            <h5 class="card-title text-dark fw-bold mb-2 text-truncate">
+              {{ product.name }}
+            </h5>
+
+            <p class="card-text mb-2 text-muted small">
+              {{ product.category.name }}
+            </p>
+
+            <p class="fw-bold fs-5 mb-3 text-success">
+              S/ {{ product.sale_price|floatformat:2 }}
+            </p>
+
+            <a href="{% url 'producto_app:producto-detail' product.id %}" 
+               class="btn btn-dark mt-auto w-100">
+              Ver detalle
             </a>
-        </li>
-    {% endfor %}
-</ul>
-
-<!-- Lista de productos -->
-<div class="row mx-2">
-    {% for product in products %}
-        <div class="col-6 col-md-3 mb-3">
-            <div class="card mb-2">
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" class="card-img-top mt-2" alt="{{ product.name }}">
-                {% else %}
-                    <img src="{% static 'img/no-image.jpg' %}" class="card-img-top" alt="Sin imagen">
-                {% endif %}
-                <div class="card-body text-center">
-                    <h5 class="card-title text-secondary">{{ product.name }}</h5>
-                    <p class="fw-bold" style="color: var(--bs-dark);">
-                    Precio: {{ product.sale_price }} soles
-                    </p>
-                </div>
-            </div>
+          </div>
         </div>
-    {% empty %}
-        <p>No hay productos para esta categoría.</p>
-    {% endfor %}
-</div>
+      </div>
+      {% empty %}
+      <div class="text-center py-5">
+        <h5 class="text-muted">😕 No hay productos disponibles en esta categoría.</h5>
+      </div>
+      {% endfor %}
+    </div>
 
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-5">
+      <ul class="pagination justify-content-center flex-wrap">
+        <!-- Anterior -->
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+          <a class="page-link rounded-circle mx-1 shadow-sm" 
+             href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">
+            &laquo;
+          </a>
+        </li>
 
+        <!-- Números -->
+        {% for i in paginator.page_range %}
+          {% if i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+          <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+            <a class="page-link rounded mx-1 shadow-sm {% if page_obj.number == i %}text-white bg-dark border-dark{% endif %}" 
+               href="?page={{ i }}">{{ i }}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+
+        <!-- Siguiente -->
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+          <a class="page-link rounded-circle mx-1 shadow-sm" 
+             href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">
+            &raquo;
+          </a>
+        </li>
+      </ul>
+    </nav>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- Estilos adicionales -->
+<style>
+  .hover-card {
+    transition: all 0.3s ease;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+  .hover-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+  }
+
+  .nav-pills .nav-link.active {
+    background-color: #212529;
+  }
+
+  .image-container {
+    height: 200px;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .card-img-top {
+    max-height: 180px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .hover-card:hover .card-img-top {
+    transform: scale(1.05);
+  }
+
+  /* === Paginación armonizada === */
+  .pagination .page-link {
+    color: #212529;
+    border: none;
+    min-width: 38px;
+    min-height: 38px;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #212529;
+    color: #fff;
+  }
+
+  .pagination .active .page-link {
+    background-color: #212529 !important;
+    border-color: #212529 !important;
+    color: #fff !important;
+  }
+
+  .pagination .page-item.disabled .page-link {
+    background-color: #f8f9fa;
+    color: #b0b0b0;
+  }
+
+  @media (max-width: 576px) {
+    .image-container {
+      height: 160px;
+    }
+    .pagination .page-link {
+      min-width: 32px;
+      min-height: 32px;
+      font-size: 0.85rem;
+    }
+  }
+</style>
 {% endblock %}
