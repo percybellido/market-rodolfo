@@ -74,10 +74,15 @@
 
     <script>
         window.print();
+
         window.onafterprint = function() {
-            // Aquí pones la URL de tu pantalla de vender
             window.location.href = "{% url 'venta_app:venta-index' %}";
         };
+
+        // Fallback en caso de que onafterprint NO funcione
+        setTimeout(function() {
+            window.location.href = "{% url 'venta_app:venta-index' %}";
+        }, 3000);
     </script>
 </body>
 </html>

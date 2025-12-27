@@ -151,80 +151,61 @@ class CarShopDeleteAll(VentasPermisoMixin, View):
 
 
 
+from django.db import DatabaseError
+
 class ProcesoVentaSimpleView(VentasPermisoMixin, View):
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
-        # 1. Recojo el carrito
-        user=self.request.user
-        productos_en_car = CarShop.objects.productos_en_carrito(self.request.user)
-
-        # 2. Busco todos los problemas de stock
-        faltantes = []
-        for item in productos_en_car:
-            disponible = item.product.count
-            solicitado = item.count
-            if solicitado > disponible:
-                faltantes.append(
-                    (item.product.name, disponible, solicitado)
-                )
-
-        # 3. Si hay faltantes, aviso y vuelvo sin procesar
-        if faltantes:
-            for nombre, disp, sol in faltantes:
-                messages.error(
-                    request,
-                    f"❌ Stock insuficiente para '{nombre}': disponible {disp}, solicitado {sol}.",
-                    extra_tags='danger'
-                )
+        try:
+            venta = procesar_venta(
+                user=request.user,
+                type_invoce=Sale.SIN_COMPROBANTE,
+                type_payment=Sale.CASH,
+            )
+        except ValueError as e:
+            messages.error(request, str(e), extra_tags='danger')
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+        except DatabaseError:
+            messages.warning(request, "Otro usuario está procesando productos. Intenta nuevamente.", extra_tags='warning')
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+        except Exception as e:
+            messages.error(request, f"Error inesperado: {e}", extra_tags='danger')
             return HttpResponseRedirect(reverse('venta_app:venta-index'))
 
-        # 4. Si todo OK, proceso la venta
-        venta = procesar_venta(
-            self=self,
-            type_invoce=Sale.SIN_COMPROBANTE,
-            type_payment=Sale.CASH,
-            user=user,
-        )
-        messages.success(request, "✔️ Venta procesada correctamente.", extra_tags='success')
-        return HttpResponseRedirect(reverse('venta_app:venta-index'))
+        if not venta:
+            messages.warning(request, "No hay productos en el carrito.", extra_tags='warning')
+        else:
+            messages.success(request, "✔️ Venta procesada correctamente.", extra_tags='success')
 
+        return HttpResponseRedirect(reverse('venta_app:venta-index'))
+    
 class ProcesoVentaVoucherView(VentasPermisoMixin, FormView):
     form_class  = VentaVoucherForm
     success_url = '.'
 
     @transaction.atomic
     def form_valid(self, form):
-        user=self.request.user
-        # 1. Pre-check de stock
-        productos_en_car = CarShop.objects.productos_en_carrito(self.request.user)
-        faltantes = []
-        for item in productos_en_car:
-            if item.count > item.product.count:
-                faltantes.append((item.product.name, item.product.count, item.count))
-
-        if faltantes:
-            for nombre, disp, sol in faltantes:
-                messages.error(
-                    self.request,
-                    f"❌ Stock insuficiente para '{nombre}': disponible {disp}, solicitado {sol}.",
-                    extra_tags='danger'
-                )
+        user = self.request.user
+        type_payment = form.cleaned_data['type_payment']
+        type_invoce = form.cleaned_data['type_invoce']
+        try:
+            venta = procesar_venta(
+                user=user,
+                type_invoce=type_invoce,
+                type_payment=type_payment
+            )
+        except ValueError as e:
+            messages.error(self.request, str(e), extra_tags='danger')
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+        except DatabaseError:
+            messages.warning(self.request, "Otro usuario está procesando productos. Intenta nuevamente.", extra_tags='warning')
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+        except Exception as e:
+            messages.error(self.request, f"Error inesperado: {e}", extra_tags='danger')
             return HttpResponseRedirect(reverse('venta_app:venta-index'))
 
-        # 2. Si pasa, llamo a procesar_venta
-        type_payment = form.cleaned_data['type_payment']
-        type_invoce  = form.cleaned_data['type_invoce']
-        venta = procesar_venta(
-            self=self,
-            type_invoce=type_invoce,
-            type_payment=type_payment,
-            user=user,
-        )
-
         if venta:
-            return HttpResponseRedirect(
-                reverse('venta_app:venta-voucher_pdf', kwargs={'pk': venta.pk})
-            )
+            return HttpResponseRedirect(reverse('venta_app:venta-voucher_pdf', kwargs={'pk': venta.pk}))
+
         messages.error(self.request, "No se pudo procesar la venta.", extra_tags='danger')
         return HttpResponseRedirect(reverse('venta_app:venta-index'))
 

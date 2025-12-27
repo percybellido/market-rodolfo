@@ -1,159 +1,130 @@
 {% extends "base.html" %}
-
-{% load  static %}
+{% load static %}
 
 {% block content %}
 
-<div class="row g-3 formulario p-3">
+<div class="row g-3 formulario p-4">
 
   <div class="col-md-12">
-    <div class="row"> 
-      <h3 class="col mt-4" style="margin-bottom: 1em; text-align: center;">Datos del Producto</h3>
-    </div>
-    <div class="row">
-      <form class="col-md-12" method="POST">{% csrf_token %}
-        <div class="row">
-          <div class="col-md-6">
-            <div class="row mb-3">
-              <div class="col">
-                <label>Codigo de barras:</label>
-              </div>
-            </div>
+    <h3 class="text-center mb-4 mt-3">Datos del Producto</h3>
 
-            <div class="row mb-2">
-              <div class="col-12">
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
-                  {{ form.barcode }}
-                </div>
-              </div>
-              
-            </div>
-            
-            
-              {% for error in form.barcode.errors %}
-                <p class="col" style="color: red;">
-                  {{ error|escape }}
-                </p>
-              {% endfor %}
-          </div>
-  
-          <div class="col-md-6">
-            <label>Nombre:</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-book"></i></span>
-              {{form.name}}
-            </div>
-          </div>
-  
-        </div>
-      
-      <div class="row">
+    <form method="POST" class="col-md-12">
+      {% csrf_token %}
+
+      <div class="row mb-3">
         <div class="col-md-6">
-          <label>Proveedor:</label>
+          <label class="form-label">Código de barras:</label>
           <div class="input-group">
-            {{form.provider}}
+            <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+            {{ form.barcode }}
           </div>
+          {% for error in form.barcode.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
         </div>
+
         <div class="col-md-6">
-          <label>Marca:</label>
+          <label class="form-label">Nombre:</label>
           <div class="input-group">
-            {{form.marca}}
+            <span class="input-group-text"><i class="bi bi-book"></i></span>
+            {{ form.name }}
           </div>
         </div>
-  
       </div>
-  
-    <div class="row">
-      <div class="col-md-6">
-        <label>Unidad de Medida:</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-tag"></i></span>
-          {{ form.unit }}
-        </div>
-      </div>
-      
-      <div class="col-md-6">
-      <label>Fecha de Vencimiento:</label>
 
-      <div class="input-group">
-        <div class="col-12">
-          <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-          {{ form.due_date }}
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Proveedor:</label>
+          <div class="input-group">
+            {{ form.provider }}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Marca:</label>
+          <div class="input-group">
+            {{ form.marca }}
+          </div>
         </div>
       </div>
 
-    </div>
-  
-    </div>  
-  
-      
-  <div class="row">
-    <div class="col-md-6">
-      <label>Precio Compra:</label>
-      <div class="input-group">
-        <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
-        {{form.purchase_price}}
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Unidad de Medida:</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            {{ form.unit }}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Cantidad en Almacén:</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-list-ol"></i></span>
+            {{ form.count }}
+          </div>
+        </div>
       </div>
-      {% for error in form.purchase_price.errors %}
-        <p class="col" style="color: red;">
-          {{ error|escape }}
-        </p>
-      {% endfor %}
-  </div>
-  <div class="col-md-6">
-      <label>Precio Venta:</label>
-      <div class="input-group">
-        <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
-        {{form.sale_price}}
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Precio Compra:</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+            {{ form.purchase_price }}
+          </div>
+          {% for error in form.purchase_price.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Precio Venta:</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+            {{ form.sale_price }}
+          </div>
+          {% for error in form.sale_price.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
       </div>
-      {% for error in form.sale_price.errors %}
-        <p class="cell" style="color: red;">
-          {{ error|escape }}
-        </p>
-      {% endfor %}
-  </div>
-  
-  
-  
-  </div>
-      
-      
-  
-  <div class="row">
-    <div class="col-md-6">
-      <label>Cantidad en Almacen:</label>
-      <div class="input-group">
-        <span class="input-group-text"><i class="bi bi-list-ol" style="color: #0d6efd;"></i></span>
-        {{form.count}}
+
+      <div class="mb-3">
+        <label class="form-label">Descripción del producto:</label>
+        <hr class="my-4">
+        <h5 class="text-center">Registrar lote inicial (opcional)</h5>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Fecha de vencimiento:</label>
+            <input type="date" name="expiration_date" class="form-control">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Cantidad del lote:</label>
+            <input type="number" name="lote_count" step="0.01" class="form-control">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Precio de compra del lote:</label>
+            <input type="number" name="lote_purchase_price" step="0.01" class="form-control">
+          </div>
+        </div>
       </div>
-    </div>
-  
-    <div class="col-md-6">
-      <label>Descripcion del producto:</label>
-      <div class="input-group">
-        {{form.description}}
-      </div>
-    </div>
-  
-  </div>
-  
-      
-      
-  
-      <div class="row d-flex justify-content-center">
-        <button type="submit" class="col-md-12 btn btn-success mt-2 mb-2 w-80 text-uppercase" >Guardar</button>
+
+      <div class="row d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-success w-75 text-uppercase mb-2">Guardar</button>
+
         {% if product %}
-        <a href="{% url 'producto_app:producto-delete' product.id %}" class="col-md-12 w-80 btn btn-danger text-uppercase">Eliminar</a>
+        <a href="{% url 'producto_app:producto-delete' product.id %}" class="btn btn-danger w-75 text-uppercase">
+          Eliminar
+        </a>
         {% endif %}
       </div>
-    </form>
-  
-    </div>
 
+    </form>
   </div>
-  
-  
 </div>
 
 {% endblock %}

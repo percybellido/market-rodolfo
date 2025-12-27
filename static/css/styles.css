@@ -313,6 +313,14 @@ h3, .h3 {
 .boton1 {
   background: #6b431e;
   color: white;
+  border: none;
+  transition: 0.25s ease-in-out;
+}
+
+.boton1:hover {
+  background: #58371a; /* un poco más oscuro */
+  color: #fff;
+  transform: scale(1.03); /* efecto suave */
 }
 
 @media (max-width: 576px) { /* aplica en móviles */
@@ -338,4 +346,8 @@ h3, .h3 {
 .blog {
   font-size: 3rem;
   color:#6b431e;
+}
+
+.text-justify-custom {
+    text-align: justify !important;
 }

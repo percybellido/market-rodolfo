@@ -62,10 +62,10 @@ class ProductManager(models.Manager):
     
 class LoteManager(models.Manager):
     from django.db import models
-from django.utils import timezone
-from datetime import timedelta
+    from django.utils import timezone
+    from datetime import timedelta
 
-class LoteManager(models.Manager):
+
     def productos_por_vencer(self, dias=30):
         """
         Retorna un queryset de lotes cuya fecha de vencimiento está dentro de los próximos `dias` días.

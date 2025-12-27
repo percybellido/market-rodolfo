@@ -1,7 +1,7 @@
 # django
 from django import forms
 # local
-from .models import Product
+from .models import Product, Lote
 
 
 class ProductForm(forms.ModelForm):
@@ -15,7 +15,6 @@ class ProductForm(forms.ModelForm):
             'marca',
             'description',
             'unit',
-            'count',
             'purchase_price',
             'sale_price',
         )
@@ -43,13 +42,6 @@ class ProductForm(forms.ModelForm):
             'unit': forms.Select(
                 attrs = {
                     'class': 'form-control',
-                }
-            ),
-            'count': forms.NumberInput(
-                attrs = {
-                    'placeholder': 'Cantidad',
-                    'class': 'form-control',
-                    'step': '0.01',
                 }
             ),
             'purchase_price': forms.NumberInput(
@@ -98,3 +90,19 @@ class ProductForm(forms.ModelForm):
             raise forms.ValidationError('El precio de venta debe ser mayor o igual que el precio de compra.')
 
         return round(sale_price, 2)
+    
+class LoteForm(forms.ModelForm):
+    class Meta:
+        model = Lote
+        fields = ('expiration_date', 'count', 'purchase_price')
+        widgets = {
+            'expiration_date': forms.DateInput(
+                attrs={'type': 'date', 'class': 'form-control'}
+            ),
+            'count': forms.NumberInput(
+                attrs={'class': 'form-control', 'step': '0.01'}
+            ),
+            'purchase_price': forms.NumberInput(
+                attrs={'class': 'form-control', 'step': '0.01'}
+            ),
+        }

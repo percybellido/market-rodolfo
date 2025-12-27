@@ -69,6 +69,7 @@ class VentaVoucherForm(forms.Form):
     type_payment = forms.ChoiceField(
         required=False,
         choices=Sale.TIPO_PAYMENT_CHOICES,
+        initial=Sale.CASH,  
         widget=forms.Select(
             attrs = {
                 'class': 'form-select',

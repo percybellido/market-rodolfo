@@ -15,8 +15,8 @@
 {% block content %}
 <section class="py-5 bg-light">
   <div class="container text-center mb-5">
-    <h2 class="fw-bold text-dark">📰 Nuestro Blog</h2>
-    <p class="text-muted">Explora nuestras últimas publicaciones</p>
+    <h2 class="fw-bold text-dark display-5">Nuestro Blog</h2>
+    <p class="text-muted fs-5">Explora nuestras últimas publicaciones</p>
   </div>
 
   <div class="container">
@@ -97,6 +97,11 @@
     .card-body {
       padding: 1.5rem;
     }
+  }
+
+  .post-content,
+  .post-content p {
+    text-align: justify !important;
   }
 </style>
 {% endblock %}

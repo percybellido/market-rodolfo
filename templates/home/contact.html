@@ -12,38 +12,65 @@
 {% endblock %}
 
 {% block content %}
-<div class="row mt-4 contacto">
-    <div class="col-lg-8 col-md-10 mx-auto text-portada">
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
-            Saepe nostrum ullam eveniet pariatur voluptates odit, fuga atque ea nobis sit soluta odio, 
-            adipisci quas excepturi maxime quae totam ducimus consectetur?
-        </p>
-        <br>
-        <p><b>Teléfono:</b> 51 935905532</p>
-        <p><b>Horario de atencion:</b>Lunes-Domingo 7:30 am - 2pm</p>
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <!-- Información de contacto -->
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <div class="p-4 shadow-sm rounded bg-light">
+          <h3 class="fw-semibold mb-3 text-success">Información de contacto</h3>
+          <p class="text-muted">
+            Si tienes alguna pregunta, sugerencia o simplemente deseas comunicarte con nosotros, no dudes en hacerlo. 
+            Responderemos lo antes posible.
+          </p>
 
-        <h3 class="mt-5 text-center">Envíame un mensaje</h3>
-        <form method="post" action="">
+          <ul class="list-unstyled mt-4">
+            <li class="mb-2">
+              <i class="bi bi-telephone-fill text-success me-2"></i>
+              <strong>Teléfono:</strong> +51 935 905 532
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-clock-fill text-success me-2"></i>
+              <strong>Horario:</strong> Lunes a Domingo, 7:30 am - 2:00 pm
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-geo-alt-fill text-success me-2"></i>
+              <strong>Ubicación:</strong> Lima, Perú
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="col-lg-6">
+        <div class="p-4 shadow-sm rounded bg-white">
+          <h3 class="fw-semibold text-success text-center mb-4">Envíanos un mensaje</h3>
+          <form method="post" action="">
             {% csrf_token %}
-            
             <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" name="nombre" id="nombre" class="form-control" required>
+              <label for="nombre" class="form-label fw-semibold">Nombre</label>
+              <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Tu nombre completo" required>
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label">Correo electrónico</label>
-                <input type="email" name="email" id="email" class="form-control" required>
+              <label for="email" class="form-label fw-semibold">Correo electrónico</label>
+              <input type="email" name="email" id="email" class="form-control" placeholder="tu@correo.com" required>
             </div>
 
             <div class="mb-3">
-                <label for="mensaje" class="form-label">Mensaje</label>
-                <textarea name="mensaje" id="mensaje" rows="5" class="form-control" required></textarea>
+              <label for="mensaje" class="form-label fw-semibold">Mensaje</label>
+              <textarea name="mensaje" id="mensaje" rows="5" class="form-control" placeholder="Escribe tu mensaje aquí..." required></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mb-4">Enviar</button>
-        </form>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                Enviar mensaje
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 {% endblock %}

@@ -1,6 +1,7 @@
 from model_utils.models import TimeStampedModel
 from django.utils import timezone
 from django.db import models
+from django.db.models import Sum
 from decimal import Decimal
 from django.utils.text import slugify
 from imagekit.models import ImageSpecField
@@ -115,6 +116,11 @@ class Product(TimeStampedModel):
                 counter+=1
             self.slug=slug
         super(Product, self).save(*args, **kwargs)
+    @property
+    def stock_real(self):
+        return self.lotes.aggregate(
+            total=Sum('count')
+        )['total'] or Decimal('0.00')
     
     @property
     def fecha_vencimiento_proxima(self):
