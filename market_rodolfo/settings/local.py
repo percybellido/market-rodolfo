@@ -9,11 +9,11 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'tienda',
-        'USER': 'mayte',
-        'PASSWORD': 'mayte2025',
+        'NAME': 'mercado_db',
+        'USER': 'rodolfo',
+        'PASSWORD': 'rodolfosuica890',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 
 }
