@@ -28,8 +28,8 @@ SESSION_COOKIE_SECURE = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS=[BASE_DIR/'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL='/media/'
 MEDIA_ROOT=BASE_DIR/'media'
