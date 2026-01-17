@@ -11,6 +11,7 @@ class ProductForm(forms.ModelForm):
         fields = (
             'barcode',
             'name',
+            'category',
             'provider',
             'marca',
             'description',
@@ -31,6 +32,9 @@ class ProductForm(forms.ModelForm):
                     'placeholder': 'Nombre...',
                     'class': 'form-control',
                 }
+            ),
+            'category': forms.Select(
+                attrs={'class': 'form-control'}
             ),
             'description': forms.Textarea(
                 attrs = {
