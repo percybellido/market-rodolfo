@@ -103,6 +103,13 @@ class SaleDetailManager(models.Manager):
         return consulta
     
     def restablecer_stock_num_ventas(self, id_venta):
+
+        detalles = self.filter(sale__id=id_venta)
+
+        print("VENTA:", id_venta)
+        print("DETALLES:", detalles.count())
+
+
         prods_en_anulados = []
         for venta_detail in self.filter(sale__id=id_venta):
             #actualizamos producto

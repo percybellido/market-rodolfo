@@ -93,25 +93,22 @@
       <div class="mb-3">
         <label class="form-label">Descripción del producto:</label>
         <hr class="my-4">
-        <h5 class="text-center">Registrar lote inicial (opcional)</h5>
+        
 
         <div class="row mb-3">
-          <div class="col-md-4">
-            <label class="form-label">Fecha de vencimiento:</label>
-            <input type="date" name="expiration_date" class="form-control">
-          </div>
+            <div class="col-md-6">
+                <label class="form-label">Fecha de vencimiento:</label>
+                <div class="input-group">
+                    {{ form.expiration_date }}
+                </div>
+            </div>
 
-          <div class="col-md-4">
-            <label class="form-label">Cantidad del lote:</label>
-            <input type="number" name="lote_count" step="0.01" class="form-control">
-          </div>
-
-          <div class="col-md-4">
-            <label class="form-label">Precio de compra del lote:</label>
-            <input type="number" name="lote_purchase_price" step="0.01" class="form-control">
+            <div class="col-md-6">
+                <label class="form-label">Descripción:</label>
+                {{ form.description }}
+            </div>
           </div>
         </div>
-      </div>
 
       <div class="row d-flex justify-content-center mt-4">
         <button type="submit" class="btn btn-success w-75 text-uppercase mb-2">Guardar</button>

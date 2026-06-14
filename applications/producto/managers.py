@@ -60,19 +60,4 @@ class ProductManager(models.Manager):
             #
             return consulta
     
-class LoteManager(models.Manager):
-    from django.db import models
-    from django.utils import timezone
-    from datetime import timedelta
 
-
-    def productos_por_vencer(self, dias=30):
-        """
-        Retorna un queryset de lotes cuya fecha de vencimiento está dentro de los próximos `dias` días.
-        """
-        hoy = timezone.now().date()
-        limite = hoy + timedelta(days=dias)
-        return self.filter(
-            expiration_date__range=(hoy, limite),
-            count__gt=0
-        ).select_related('product').order_by('expiration_date')

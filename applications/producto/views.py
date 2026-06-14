@@ -1,6 +1,8 @@
+from datetime import timedelta
+from django.utils import timezone
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404
-from .models import Product, Category, Lote
+from .models import Product, Category
 from django.urls import reverse_lazy
 from django.views.generic import (
     ListView,
@@ -30,29 +32,7 @@ class ProductCreateView(CreateView):
     form_class = ProductForm
     success_url = reverse_lazy('producto_app:producto-lista')
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-
-        expiration_date = self.request.POST.get("expiration_date")
-        count = self.request.POST.get("lote_count")
-        purchase_price = self.request.POST.get("lote_purchase_price")
-
-        if expiration_date and count and purchase_price:
-            count = Decimal(count)
-            purchase_price = Decimal(purchase_price)
-
-            Lote.objects.create(
-                product=self.object,
-                expiration_date=expiration_date,
-                count=count,
-                purchase_price=purchase_price
-            )
-
-            self.object.count += count
-            self.object.purchase_price = purchase_price
-            self.object.save(update_fields=["count", "purchase_price"])
-
-        return response
+   
 
 class ProductUpdateView(UpdateView):
     template_name="producto/form_producto.html"
@@ -110,6 +90,14 @@ class CategoryProductListView(ListView):
         return context
 
 def productos_por_vencer_view(request):
-    lotes_por_vencer = Lote.objects.productos_por_vencer()
-    context = {"lotes": lotes_por_vencer}
+    fecha_limite=timezone.now().date() + timedelta(days=30)
+    productos_por_vencer=Product.objects.filter(
+        expiration_date__isnull=False,
+        expiration_date__lte=fecha_limite,
+        count__gt=0
+    ).order_by('expiration_date')
+    context={
+        "productos":productos_por_vencer
+    }
+
     return render(request, "producto/por_vencer.html", context)

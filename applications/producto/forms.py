@@ -1,7 +1,7 @@
 # django
 from django import forms
 # local
-from .models import Product, Lote
+from .models import Product
 
 
 class ProductForm(forms.ModelForm):
@@ -16,6 +16,8 @@ class ProductForm(forms.ModelForm):
             'marca',
             'description',
             'unit',
+            'count',
+            'expiration_date',
             'purchase_price',
             'sale_price',
         )
@@ -95,18 +97,3 @@ class ProductForm(forms.ModelForm):
 
         return round(sale_price, 2)
     
-class LoteForm(forms.ModelForm):
-    class Meta:
-        model = Lote
-        fields = ('expiration_date', 'count', 'purchase_price')
-        widgets = {
-            'expiration_date': forms.DateInput(
-                attrs={'type': 'date', 'class': 'form-control'}
-            ),
-            'count': forms.NumberInput(
-                attrs={'class': 'form-control', 'step': '0.01'}
-            ),
-            'purchase_price': forms.NumberInput(
-                attrs={'class': 'form-control', 'step': '0.01'}
-            ),
-        }

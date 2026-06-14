@@ -44,8 +44,8 @@
               
               <li><strong>Precio venta:</strong> <span class="text-success fw-bold">{{ product.sale_price }} S/.</span></li>
               
-              {% if product.fecha_vencimiento_proxima %}
-                <li><strong>Vencimiento:</strong> {{ product.fecha_vencimiento_proxima }}</li>
+              {% if  product.expiration_date %}
+                <li><strong>Vencimiento:</strong> {{ product.expiration_date }}</li>
               {% endif %}
               <li><strong>Descripción:</strong><br>{{ product.description|default:"Sin descripción" }}</li>
             </ul>

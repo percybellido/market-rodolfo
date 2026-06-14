@@ -1,10 +1,12 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.views.generic import (
     TemplateView,
     ListView
 )
 from applications.venta.models import Sale, SaleDetail
-from applications.producto.models import Product, Lote
+from applications.producto.models import Product
 from applications.users.mixins import AdminPermisoMixin
 #
 from .forms import LiquidacionProviderForm, ResumenVentasForm
@@ -25,12 +27,19 @@ class HomeView(TemplateView):
 
 class PanelAdminView(AdminPermisoMixin, TemplateView):
     template_name = "home/administrador.html"
+    fecha_limite=timezone.now().date() + timedelta(days=30)
 
     def get_context_data(self, **kwargs):
+        fecha_limite=timezone.now().date() + timedelta(days=30)
+
         context = super().get_context_data(**kwargs)
         context["total_ventas"] = Sale.objects.total_ventas_dia()
         context["total_anulaciones"] = Sale.objects.total_ventas_anuladas_dia()
-        context["por_vencer"] = Lote.objects.productos_por_vencer().count()
+        context["por_vencer"] = Product.objects.filter(
+            expiration_date__isnull=False,
+            expiration_date__lte=fecha_limite,
+            count__gt=0
+        ).count()
         context["resumen_semana"] = SaleDetail.objects.resumen_ventas()[:7]
         return context
     

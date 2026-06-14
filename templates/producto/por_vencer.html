@@ -16,12 +16,12 @@
         </tr>
       </thead>
       <tbody>
-        {% for lote in lotes %}
+        {% for producto in productos %}
         <tr>
-          <td>{{ lote.product.name }}</td>
-          <td>{{ lote.product.category.name }}</td>
-          <td>{{ lote.expiration_date }}</td>
-          <td>{{ lote.count }}</td>
+          <td>{{ producto.name }}</td>
+          <td>{{ producto.category.name }}</td>
+          <td>{{ producto.expiration_date }}</td>
+          <td>{{ producto.count }}</td>
         </tr>
         {% empty %}
         <tr>

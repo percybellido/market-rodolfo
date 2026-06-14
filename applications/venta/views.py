@@ -59,13 +59,16 @@ class AddCarView(VentasPermisoMixin, FormView):
 
         # 🧩 Caso 2: sin código de barras
         elif product:
-            productos = Product.objects.filter(
-                barcode__isnull=True,
-                name__icontains=product
+            productos = list(
+                Product.objects.filter(
+                    barcode__isnull=True,
+                    name__icontains=product
+                )[:2]
             )
-            if productos.count() == 1:
-                product_obj = productos.first()
-            elif productos.count() > 1:
+
+            if len(productos) == 1:
+                product_obj = productos[0]
+            elif len(productos)() > 1:
                 messages.warning(
                     self.request,
                     f"⚠️ Se encontraron {productos.count()} coincidencias para '{product}', refine la búsqueda.",
@@ -97,8 +100,9 @@ class AddCarView(VentasPermisoMixin, FormView):
         )
 
         if not created:
-            obj.count = obj.count + count
-            obj.save(update_fields=['count'])
+            CarShop.objects.filter(pk=obj.pk).update(
+                count=F('count') + count
+            )
 
         return super().form_valid(form)
 
@@ -248,15 +252,29 @@ class SaleDeleteView(VentasPermisoMixin, DeleteView):
     model = Sale
     success_url = reverse_lazy('venta_app:venta-index')
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         self.object = self.get_object()
-        self.object.anulate = True
-        self.object.save()
-        # actualizmos sl stok y ventas
-        SaleDetail.objects.restablecer_stock_num_ventas(self.object.id)
-        success_url = self.get_success_url()
 
-        return HttpResponseRedirect(success_url)
+        if self.object.anulate:
+            messages.error(
+                self.request,
+                "La venta ya fue anulada."
+            )
+            return HttpResponseRedirect(
+                self.get_success_url()
+            )
+
+        self.object.anulate = True
+        self.object.save(update_fields=['anulate'])
+
+        
+        SaleDetail.objects.restablecer_stock_num_ventas(
+            self.object.id
+        )
+
+        return HttpResponseRedirect(
+            self.get_success_url()
+        )
 
     
 

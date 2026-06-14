@@ -53,10 +53,10 @@
           <td class="d-none d-md-table-cell">{{ product.provider }}</td>
           <td>{{ product.sale_price }}</td>
           <td>
-            {{ product.stock_real }}
-            {% if product.stock_real == 0 %}
+            {{ product.count }}
+            {% if product.count == 0 %}
               <span class="text-danger ms-2 fw-bold">¡¡Agotado!!</span>
-            {% elif product.stock_real <= 6 %}
+            {% elif product.count <= 6 %}
               <span class="text-warning ms-2 fw-bold">¡Se agotan!</span>
             {% endif %}
           </td>
@@ -64,10 +64,10 @@
             {{ product.description }}
           </td>
           <td>
-            {% if product.fecha_vencimiento_proxima %}
-              {{ product.fecha_vencimiento_proxima }}
+            {% if product.expiration_date %}
+                {{ product.expiration_date }}
             {% else %}
-              <span class="text-muted">Sin lote</span>
+                <span class="text-muted">Sin fecha</span>
             {% endif %}
           </td>
           <td class="text-center">
