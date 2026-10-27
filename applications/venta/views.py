@@ -1,5 +1,6 @@
 # django
 from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     View,
@@ -68,7 +69,7 @@ class AddCarView(VentasPermisoMixin, FormView):
 
             if len(productos) == 1:
                 product_obj = productos[0]
-            elif len(productos)() > 1:
+            elif len(productos)> 1:
                 messages.warning(
                     self.request,
                     f"⚠️ Se encontraron {productos.count()} coincidencias para '{product}', refine la búsqueda.",
@@ -208,10 +209,26 @@ class ProcesoVentaVoucherView(VentasPermisoMixin, FormView):
             return HttpResponseRedirect(reverse('venta_app:venta-index'))
 
         if venta:
-            return HttpResponseRedirect(reverse('venta_app:venta-voucher_pdf', kwargs={'pk': venta.pk}))
+            return HttpResponseRedirect(reverse('venta_app:venta-voucher_html', kwargs={'pk': venta.pk}))
 
         messages.error(self.request, "No se pudo procesar la venta.", extra_tags='danger')
         return HttpResponseRedirect(reverse('venta_app:venta-index'))
+
+class VentaVoucherHtml(VentasPermisoMixin, View):
+    """Renderiza el voucher como HTML para impresión directa vía window.print()."""
+
+    def get(self, request, *args, **kwargs):
+        venta = Sale.objects.get(id=self.kwargs['pk'])
+        detalles = SaleDetail.objects.filter(sale__id=self.kwargs['pk'])
+
+        for detalle in detalles:
+            detalle.subtotal = detalle.count * detalle.price_sale
+
+        data = {
+            'venta': venta,
+            'detalle_productos': detalles,
+        }
+        return render(request, 'venta/voucher.html', data)
 
 class VentaVoucherPdf(VentasPermisoMixin, View):
     
