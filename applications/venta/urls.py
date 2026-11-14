@@ -50,6 +50,11 @@ urlpatterns = [
     name='venta-voucher_html',
     ),
     path(
+    'venta/voucher-imin-test/',
+    views.VentaVoucherIminTest.as_view(),
+    name='venta-voucher_imin_test',
+    ),
+    path(
         'venta/ultimas-ventas/', 
         views.SaleListView.as_view(),
         name='venta-list',

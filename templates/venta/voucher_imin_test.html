@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prueba WebPrint iMin Swan 2</title>
+    
+    <!-- Carga tu archivo descargado desde tu carpeta static de Django -->
+    <script src="{% static 'js/imin-printer.min.js' %}"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #e9ecef;
+            padding: 20px;
+            margin: 0;
+        }
+        .panel-control {
+            width: 576px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+        }
+        .btn-imprimir {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-imprimir:disabled {
+            background: #6c757d;
+        }
+        #estado {
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* CONTENEDOR EXACTO PARA EL CABEZAL DE 80MM DE LA SWAN 2 (576px = 72mm útiles) */
+        #ticket-imin {
+            width: 576px;
+            background: #ffffff;
+            color: #000000;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 22px;
+            line-height: 1.4;
+            margin: 0 auto;
+        }
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .line { border-top: 2px dashed #000000; margin: 12px 0; }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
+        .logo {
+            max-width: 240px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel-control">
+        <button id="btnImprimir" class="btn-imprimir" onclick="imprimirTicket()" disabled>
+            ⏳ CONECTANDO CON IMPRESORA...
+        </button>
+        <div id="estado">Iniciando servicio WebPrint...</div>
+    </div>
+
+    <!-- Este bloque completo se enviará como imagen exacta de 80mm a la impresora -->
+    <div id="ticket-imin">
+        <div class="center">
+            <!-- Descomenta y pon la ruta de tu imagen en static cuando quieras probar el logo -->
+            <!-- <img src="{% static 'img/logo.png' %}" class="logo" alt="Logo"> -->
+            <h2 style="margin: 0; font-size: 28px;">MINIMARKET RODOLFO</h2>
+            <p style="margin: 4px 0;">VOUCHER DE PRUEBA - SWAN 2</p>
+        </div>
+
+        <div class="line"></div>
+
+        <div>Fecha: 12/11/2026</div>
+        <div>Venta: PRUEBA-001</div>
+        <div>Cliente: CLIENTE DE PRUEBA</div>
+
+        <div class="line"></div>
+
+        <div class="row bold">
+            <span>PRODUCTO</span>
+            <span>TOTAL</span>
+        </div>
+
+        <div class="row">
+            <span>1x Producto de prueba</span>
+            <span>25.00</span>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="row bold" style="font-size: 28px;">
+            <span>TOTAL:</span>
+            <span>S/ 25.00</span>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="center">
+            <p style="margin: 4px 0;">FORMA DE PAGO: CONTADO</p>
+            <p style="margin: 4px 0;">¡GRACIAS POR SU COMPRA!</p>
+        </div>
+    </div>
+
+    <script>
+        var IminPrintInstance = new IminPrinter();
+        var btnImprimir = document.getElementById('btnImprimir');
+        var textoEstado = document.getElementById('estado');
+
+        // 1. Conectar automáticamente al cargar la página en la iMin Swan 2
+        IminPrintInstance.connect().then(async (isConnect) => {
+            if (isConnect) {
+                IminPrintInstance.initPrinter();
+                btnImprimir.disabled = false;
+                btnImprimir.innerText = "🖨️ IMPRIMIR TICKET 80MM";
+                textoEstado.innerText = "✅ Conectado a iMin Swan 2";
+                textoEstado.style.color = "green";
+            } else {
+                textoEstado.innerText = "❌ Error: No se pudo conectar con WebPrint.";
+                textoEstado.style.color = "red";
+            }
+        }).catch(function(err) {
+            textoEstado.innerText = "❌ Error de conexión: " + err;
+            textoEstado.style.color = "red";
+        });
+
+        // 2. Función de impresión exacta con corte automático
+        async function imprimirTicket() {
+            btnImprimir.disabled = true;
+            btnImprimir.innerText = "Imprimiendo...";
+
+            try {
+                const ticketElement = document.getElementById("ticket-imin");
+                
+                // Envía el HTML completo (texto + imágenes) a la impresora térmica
+                await IminPrintInstance.printHtml(ticketElement);
+                
+                // Avanza el papel y acciona el cortador automático
+                IminPrintInstance.printAndFeedPaper(100);
+                IminPrintInstance.partialCut();
+            } catch (error) {
+                alert("Error al imprimir: " + error);
+            } finally {
+                btnImprimir.disabled = false;
+                btnImprimir.innerText = "🖨️ IMPRIMIR TICKET 80MM";
+            }
+        }
+    </script>
+
+</body>
+</html>

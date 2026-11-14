@@ -230,6 +230,18 @@ class VentaVoucherHtml(VentasPermisoMixin, View):
         }
         return render(request, 'venta/voucher.html', data)
 
+class VentaVoucherIminTest(VentasPermisoMixin, View):
+    """
+    Página experimental para probar la impresión
+    mediante el sistema Web Print de iMin.
+    """
+
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            'venta/voucher_imin_test.html'
+        )
+
 class VentaVoucherPdf(VentasPermisoMixin, View):
     
     def get(self, request, *args, **kwargs):
