@@ -147,14 +147,27 @@
 
             printer.setTextStyle(0);
 
-            // Productos de prueba
-            printer.printColumnsText(
-                ["Producto de prueba", "1", "25.00", "25.00"],
-                [276, 60, 100, 140],
-                [0, 1, 2, 2],
-                20,
-                576
-            );
+            // Productos de prueba: impresión de texto normal
+            printer.setTextSize(20);
+
+            printer.printText("PRODUCTOS:");
+
+            printer.printText("Producto de prueba");
+
+            printer.printText("Cantidad: 1");
+
+            printer.printText("Precio unitario: S/ 25.00");
+
+            printer.printText("Importe: S/ 25.00");
+
+            printer.printText("--------------------------------");
+
+            // Total
+            printer.setTextStyle(1);
+
+            printer.printText("TOTAL: S/ 25.00");
+
+            printer.setTextStyle(0);
 
             printer.printText("--------------------------------");
 
@@ -178,6 +191,8 @@
 
             // Avance final del papel
             printer.printText("\n\n");
+
+            printer.partialCut();
 
             textoEstado.innerText =
                 "Comandos enviados. Verifica la impresión física.";
