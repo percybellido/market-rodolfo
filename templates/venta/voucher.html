@@ -1,108 +1,162 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <style>
-    body {
-        font-family: monospace;
-        font-size: 12px;
-        width: 80mm;
-        margin: 0 auto;
-    }
-    .centrado { text-align: center; }
-    .derecha { text-align: right; }
-    .linea {
-        border-top: 1px dashed #000;
-        margin: 4px 0;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    td {
-        padding: 2px 0;
-        vertical-align: top;
-    }
-    .total {
-        font-weight: bold;
-        font-size: 13px;
-    }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voucher de venta</title>
 
-    @media print {
-        
+    {% load static %}
+    <script src="{% static 'js/imin-printer.min.js' %}"></script>
+
+    <style>
         body {
-            width: 80mm;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            padding: 15px;
+            text-align: center;
         }
-    }
-</style>
+
+        #estado {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .volver {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 18px;
+            background: #198754;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
+
 <body>
 
-    <div class="centrado">
-        <strong>MiniMarket Rodolfo</strong><br>
-        Fecha: {{ venta.date_sale|date:"d/m/Y H:i" }}<br>
-        <div class="linea"></div>
-    </div>
+    <h3>MiniMarket Rodolfo</h3>
+    <p>Procesando impresión del voucher...</p>
 
-    <p>Cantidad de productos: {{ venta.count }}</p>
-    <p>Tipo de Pago: {{ venta.get_type_invoce_display }}</p>
+    <div id="estado">Conectando con la impresora...</div>
 
-    <div class="linea"></div>
-    <strong>Productos:</strong>
-
-    <table>
-        {% for producto in detalle_productos %}
-        <tr>
-            <td>
-                {{ producto.product.name|truncatechars:20 }}<br>
-                {{ producto.count }} x {{ producto.price_sale|floatformat:2 }}
-            </td>
-            <td class="derecha">
-                S/. {{ producto.subtotal|floatformat:2 }}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <div class="linea"></div>
-    <table>
-        <tr>
-            <td class="derecha total">TOTAL:</td>
-            <td class="derecha total">S/. {{ venta.amount|floatformat:2 }}</td>
-        </tr>
-    </table>
-
-    <div class="linea"></div>
-    <p class="centrado">¡Gracias por su compra!</p>
-
-    <div class="centrado no-print" style="margin-top: 10px;">
-    <a href="{% url 'venta_app:venta-index' %}" style="font-size: 11px;">Volver al inicio</a>
-    </div>
+    <a class="volver" href="{% url 'venta_app:venta-index' %}">
+        Volver al inicio
+    </a>
 
     <script>
-    window.addEventListener('load', function () {
-    
-    var alturaMm = document.body.getBoundingClientRect().height * 25.4 / 96;
+        const volverAlIndex = "{% url 'venta_app:venta-index' %}";
 
-    
-    var style = document.createElement('style');
-    style.textContent = '@page { size: 80mm ' + Math.ceil(alturaMm + 2) + 'mm; margin: 0; }';
-    document.head.appendChild(style);
+        async function imprimirVoucher() {
+            const estado = document.getElementById("estado");
 
-    
-    window.print();
-});
-    var volverAlIndex = "{% url 'venta_app:venta-index' %}";
+            try {
+                const printer = new IminPrinter();
 
-    window.onafterprint = function () {
-        window.location.href = volverAlIndex;
-    };
+                estado.textContent = "Conectando con iMin Swan2...";
 
-    setTimeout(function () {
-        window.location.href = volverAlIndex;
-    }, 15000);
-</script>
+                const conectado = await printer.connect();
+
+                if (!conectado) {
+                    throw new Error("No se pudo conectar con la impresora.");
+                }
+
+                estado.textContent = "Impresora conectada. Imprimiendo...";
+
+                printer.initPrinter();
+
+                // Encabezado
+                printer.setAlignment(1);
+                printer.setTextSize(28);
+                printer.setTextStyle(1);
+                printer.printText("MINIMARKET RODOLFO");
+
+                printer.setTextStyle(0);
+                printer.setTextSize(20);
+                printer.printText("VOUCHER DE VENTA");
+                printer.printText("--------------------------------");
+
+                // Datos de la venta
+                printer.setAlignment(0);
+
+                printer.printText(
+                    "Fecha: {{ venta.date_sale|date:'d/m/Y H:i'|escapejs }}"
+                );
+
+                printer.printText(
+                    "Cantidad de productos: {{ venta.count|escapejs }}"
+                );
+
+                printer.printText(
+                    "Tipo de pago: {{ venta.get_type_invoce_display|escapejs }}"
+                );
+
+                printer.printText("--------------------------------");
+
+                // Productos
+                printer.setTextStyle(1);
+                printer.printText("PRODUCTOS:");
+                printer.setTextStyle(0);
+
+                {% for producto in detalle_productos %}
+
+                    printer.setTextSize(20);
+
+                    printer.printText(
+                        "{{ producto.product.name|truncatechars:30|escapejs }}"
+                    );
+
+                    printer.printText(
+                        "Cantidad: {{ producto.count|escapejs }}"
+                    );
+
+                    printer.printText(
+                        "Precio unitario: S/ {{ producto.price_sale|floatformat:2|escapejs }}"
+                    );
+
+                    printer.printText(
+                        "Importe: S/ {{ producto.subtotal|floatformat:2|escapejs }}"
+                    );
+
+                    printer.printText("--------------------------------");
+
+                {% endfor %}
+
+                // Total
+                printer.setTextSize(24);
+                printer.setTextStyle(1);
+
+                printer.printText(
+                    "TOTAL: S/ {{ venta.amount|floatformat:2|escapejs }}"
+                );
+
+                printer.setTextStyle(0);
+                printer.setTextSize(20);
+
+                printer.printText("--------------------------------");
+
+                // Despedida
+                printer.setAlignment(1);
+                printer.printText("¡GRACIAS POR SU COMPRA!");
+
+                // Avance y corte de papel
+                printer.printText("\n\n");
+                printer.partialCut();
+
+                estado.textContent =
+                    "Voucher enviado a la impresora. Verifica la impresión.";
+
+            } catch (error) {
+                console.error("Error de impresión:", error);
+
+                estado.textContent =
+                    "Error de impresión: " + error.message +
+                    ". Puedes volver a intentar o regresar al inicio.";
+            }
+        }
+
+        window.addEventListener("load", imprimirVoucher);
+    </script>
+
 </body>
 </html>
